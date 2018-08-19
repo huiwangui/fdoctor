@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.GroupMsgTemplateDao">
+	<!-- 新增群发模板 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.GroupMsgTemplateEntity" >
+		insert into t_group_msg_template (doc_team_id, template_name, 
+		  template_content, default_flag)
+		values (#{docTeamId,jdbcType=VARCHAR}, #{templateName,jdbcType=VARCHAR}, 
+		  #{templateContent,jdbcType=VARCHAR}, #{defaultFlag,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 修改群发模板 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.GroupMsgTemplateEntity" >
+	    update t_group_msg_template
+	    <set >
+	      <if test="docTeamId != null" >
+	        doc_team_id = #{docTeamId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="templateName != null" >
+	        template_name = #{templateName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="templateContent != null" >
+	        template_content = #{templateContent,jdbcType=VARCHAR},
+	      </if>
+	      <if test="defaultFlag != null" >
+	        default_flag = #{defaultFlag,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where id = #{id,jdbcType=INTEGER}
+	 </update>
+	 
+	 <!-- 删除群发模板 -->
+	 <delete id="delete" parameterType="string">
+	 	delete from t_group_msg_template where id = #{0}
+	 </delete>
+	 
+	 <!-- 根据医生团队ID获取群发模板列表 -->
+	 <select id="getTemplateByDocTeam" parameterType="string" resultType="com.boco.modules.fdoc.model.GroupMsgTemplateEntity">
+	 	select id, doc_team_id, template_name, template_content, default_flag from t_group_msg_template
+	 	where doc_team_id = #{0}
+	 </select>
+</mapper>

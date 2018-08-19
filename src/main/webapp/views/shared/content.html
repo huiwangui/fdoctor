@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>基金缴纳</title>
+<link href="../../statics/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+<link href="../../statics/css/style.css" rel="stylesheet" type="text/css" />
+<link href="../../statics/css/common.css" rel="stylesheet" type="text/css" />
+<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+<script src="../../statics/js/jquery-1.11.0.min.js"></script>
+</head>
+<body bgcolor="#F5F5F5">
+	<div class="container">
+		<div class="top-bar">
+			<div class="locate-index">
+				位置:<span>签约服务包管理/</span><span>编辑</span>
+				
+			</div>
+		</div>
+		<div class="layer">
+			<!-- 查询表单 -->
+			<form method="post" class="form-inline" id="findPerson"
+				action="">
+				<input type="hidden" id="outPutType" name="outPutType" value="">
+				<div>
+					<!-- <p class="text-danger">${error_message}</p> -->
+				</div>
+				<div class="form-group">
+					<label>签约包名称:</label> <select name="countyCode"
+						id="countyCode" class="form-control"
+						onclick="getSubordinatesBySuperior(document.getElementById('countyCode').value, 'townCode');">
+						<option value="">-请选择-</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label>居民自付金额:</label> <select name="townCode"
+						value="${findPersonDto.townCode}" id="townCode"
+						class="form-control"
+						onchange="getSubordinatesBySuperior(document.getElementById('townCode').value, 'villageCode');">
+						<option value="">-请选择-</option>
+					</select>
+				</div>
+				<div class="form-group">
+					<label class="label-short">价格:</label> <select name="villageCode"
+						value="${findPersonDto.villagelst}" id="villageCode"
+						class="form-control">
+						<option value="">-请选择-</option>
+						<!-- 历史c标签循环实例 -->
+						<!-- <c:forEach items="${findPersonDto.villagelst}" var="village"
+							varStatus="status">
+							<c:if test="${village.key==findPersonDto.villageCode}">
+								<option value="${village.key}" selected>${village.value}</option>
+							</c:if>
+							<c:if test="${village.key!=findPersonDto.villageCode}">
+								<option value="${village.key}">${village.value}</option>
+							</c:if>
+						</c:forEach> -->
+					</select>
+				</div>
+	
+
+				<div class="form-group">
+					<label>机构分成比例:</label> <input type="text"
+						class="form-control" name="personName"
+						value="">
+				</div>
+	
+			</form>
+			<!-- 显示区数据表格table -->
+			<form method="post" id="personPaymentForm" class="data-form"
+				action="${pageContext.request.contextPath}/fund/personPayment.do">
+				<input type="hidden" name="year" value="${findPersonDto.year}">
+				<input type="hidden" name="paymentAmount"
+					value="${findPersonDto.paymentAmount}"> <input
+					type="hidden" name="aidAmount" value="${findPersonDto.aidAmount}">
+				<table class="table" cellspacing="0" cellpadding="0">
+					<tr>
+						<th width="100">服务项目列表</th>
+						<th>名称</th>
+						<th>内容</th>
+						<th width="80">原价格</th>
+						<th width="80">频次</th>
+						<th width="80">服务时间</th>
+						<th>执行机构</th>
+						<th width="80">操作</th>
+					</tr>
+					<!-- <c:forEach items="${findPersonDto.fpDtoList}" var="fpDto"
+						varStatus="status">
+						<tr>
+							<td><input type="checkbox" name="personIds"
+								id=${status.count } value="${fpDto.personId}">
+								&nbsp;${status.count }</td>
+							<td>${fpDto.medicalCard}</td>
+							<td>${fpDto.personName}</td>
+							<td>${fns:getDictLabel(fpDto.personSex,'S101-01','')}</td>
+							<td>
+								${fns:getDictLabel(fpDto.householdRelationship,'S101-06','')}
+							</td>
+							<td>
+								${fns:getDictLabel(fpDto.householdAttribute,'S101-09','')}
+							</td>
+							<td>${fpDto.year}</td>
+							<td><input type="hidden"
+								id="governmentAidSign${status.count}"
+								value="${fpDto.governmentAidSign}"> 
+								<c:if test="${fpDto.governmentAidSign!=1}">
+							${findPersonDto.paymentAmount}
+								</c:if>
+							</td>
+							<td><c:if test="${fpDto.governmentAidSign==1}">
+							${findPersonDto.aidAmount}
+						</c:if></td>
+							<td></td>
+							<td>${user_session_infos.userInfo.userRealName}</td>
+						</tr>
+					</c:forEach> -->
+					<tr>
+						<td>服务项目列表</td>
+						<td>提供健康评估及规划</td>
+						<td>根据健康档案信息，每年对居民档案状况进行一次年度评估，并根据评估结果，制定下一年度居民健康规划和目标</td>
+						<td>300</td>
+						<td>1次</td>
+						<td>签约后每一年</td>
+						<td>成华区双桥社区卫生院</td>
+						<td><input type="button" name="" class="btn btn-red" value="删除"></td>
+					</tr>
+					<tr>
+						<td>服务项目列表</td>
+						<td>提供健康评估及规划</td>
+						<td>根据健康档案信息，每年对居民档案状况进行一次年度评估，并根据评估结果，制定下一年度居民健康规划和目标</td>
+						<td>300</td>
+						<td>1次</td>
+						<td>签约后每一年</td>
+						<td>成华区双桥社区卫生院</td>
+						<td><input type="button" name="" class="btn btn-red" value="删除"></td>
+					</tr>
+					<tr>
+						<td>服务项目列表</td>
+						<td>提供健康评估及规划</td>
+						<td>根据健康档案信息，每年对居民档案状况进行一次年度评估，并根据评估结果，制定下一年度居民健康规划和目标</td>
+						<td>300</td>
+						<td>1次</td>
+						<td>签约后每一年</td>
+						<td>成华区双桥社区卫生院</td>
+						<td><input type="button" name="" class="btn btn-red" value="删除"></td>
+					</tr>
+					<tr>
+						<td>服务项目列表</td>
+						<td>提供健康评估及规划</td>
+						<td>根据健康档案信息，每年对居民档案状况进行一次年度评估，并根据评估结果，制定下一年度居民健康规划和目标</td>
+						<td>300</td>
+						<td>1次</td>
+						<td>签约后每一年</td>
+						<td>成华区双桥社区卫生院</td>
+						<td><input type="button" name="" class="btn btn-red" value="删除"></td>
+					</tr>
+					<tr>
+						<td>服务项目列表</td>
+						<td>提供健康评估及规划</td>
+						<td>根据健康档案信息，每年对居民档案状况进行一次年度评估，并根据评估结果，制定下一年度居民健康规划和目标</td>
+						<td>300</td>
+						<td>1次</td>
+						<td>签约后每一年</td>
+						<td>成华区双桥社区卫生院</td>
+						<td>
+							<input type="button" name="" class="btn btn-red" value="删除">
+							<input type="button" name="" class="btn btn-green" value="添加">
+						</td>
+					</tr>
+				</table>
+				<div class="wrap" style="text-align:center">
+					<button type="button" class="btn btn-blue"
+								onclick="">确定</button>
+
+					<button type="button" class="btn btn-blue"
+								onclick="">返回</button>
+				</div>
+			</form>
+			<div class="g-right">
+
+			<!-- 操作按钮 -->
+			
+					 <!-- 	<input type="button" class="btn btn-red"
+							onclick="downloadList('pdf')" value="导出Pdf"><script
+								type="text/javascript">
+								function downloadList(fileType) {
+									var action = $("#findPerson")
+											.attr("action");
+									$("#findPerson")
+											.attr("action",
+													"${pageContext.request.contextPath}/fund/downLoadPersonPayment.do");
+									$("#outPutType").val(fileType);
+									$("#findPerson").submit();
+									$("#findPerson").attr("action", action);
+									$("#outPutType").val("");
+									;
+								}
+							</script> -->
+			</div>
+			<!-- 可能存在的分页 -->
+			<div class="g-left">
+				<p:page dto="findPersonDto" findFormId="findPerson"/>
+			</div>
+		
+		</div>
+		<!-- 模态框 -->
+		<div class="modal fade">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">提示信息</h4>
+					</div>
+					<div class="modal-body">
+						<div id="paymentContent"></div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-blue"
+							onclick="fundPayment()">确认</button>
+						<button type="button" class="btn" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+		</div>
+		
+		<!-- 新 Bootstrap 核心 CSS 文件 -->
+
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script src="../../statics/js/bootstrap.min.js"></script>
+
+<!-- 日期选择器 -->
+<script src="../../statics/js/bootstrap-datetimepicker.min.js"></script>
+<script src="../../statics/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script type="text/javascript">
+	$('.form_date').datetimepicker({
+		format: 'yyyy',
+        language:  'zh-CN',
+        weekStart: 0,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 4,
+		initialDate:2015,
+		minView: 4,
+		forceParse: 0
+    });
+</script>
+
+
+</body>
+</html>

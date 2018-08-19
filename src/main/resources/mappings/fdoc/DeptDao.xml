@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.DeptDao">
+
+	<sql id="deptColumns">
+		d.id,
+		d.his_id,
+		d.name,
+		d.code,
+		d.detail,
+		d.age_limit,
+		d.create_time,
+		d.update_time,
+		d.level
+	</sql>
+	<!-- 获取科室列表 -->
+	<select id="findDeptList" parameterType="int" resultType="DepartmentEntity">
+		SELECT
+		<include refid="deptColumns" /> 
+		 FROM t_hospital h
+		 LEFT JOIN t_hospital_dept hd
+		 ON h.`id`=hd.`hosp_id`
+		 LEFT JOIN t_department d
+		 ON hd.`dept_id`=d.`id`
+		 WHERE h.`id`= #{id} 
+	</select>
+	<!-- 通过名称查询科室 -->
+	<select id="findDeptByName" parameterType="string" resultType="DepartmentEntity">
+		SELECT
+		<include refid="deptColumns" /> 
+		 FROM t_department d
+		 WHERE d.name LIKE CONCAT('%',#{name},'%') 
+	</select>
+	<!-- 查询科室详情 -->
+	<select id="getDeptDetail" parameterType="int" resultType="DepartmentEntity">
+		SELECT
+		<include refid="deptColumns" /> 
+		 FROM t_department d
+		 WHERE d.id=#{id} 
+	</select>
+	<!-- 按城市获取一级科室列表 -->
+	<select id="getDefaultDepts" parameterType="string" resultType="DepartmentEntity">
+		SELECT 
+		<include refid="deptColumns" /> 
+		FROM t_department d
+		WHERE d.level='0'
+		AND d.id IN
+		(SELECT dept_id FROM t_hospital h LEFT JOIN t_hospital_dept ON h.`id`=hosp_id WHERE h.`status`='0' 
+		<!-- AND city=#{city} //暂时忽略地区条件-->
+		)
+	</select>
+	<!-- 通过医院ID获取预约量 -->
+	<select id="getBookingDepts" parameterType="com.boco.modules.fdoc.vo.QuickBookingVo" resultType="DepartmentEntity">
+		select c.id ,c.`name` 
+		from t_schedule a left join t_doctor b on a.doc_id=b.id
+		left join t_department c on b.dept_id=c.id
+		where (a.period=#{period} or a.period=0) and a.work_time=FROM_UNIXTIME(#{worktime}, '%Y-%m-%d')
+		and b.hosp_id=#{hospId}
+		group by c.id,c.name
+	</select>
+	<!-- 通过医院ID获取主科室 -->
+	<select id="getMainDepts" resultType="DepartmentEntity">
+		SELECT
+		<include refid="deptColumns" /> 
+		 FROM t_hospital h
+		 LEFT JOIN t_hospital_dept hd
+		 ON h.`id`=hd.`hosp_id`
+		 LEFT JOIN t_department d
+		 ON hd.`dept_id`=d.`id`
+		 WHERE h.`id`= #{hospId} and d.level=0
+	</select>
+	<!-- 通过医院ID获取副科室 -->
+	<select id="getSubDepts" resultType="com.boco.modules.fdoc.vo.DepartmentVo">
+		SELECT
+		<include refid="deptColumns" /> 
+		 FROM t_hospital h
+		 LEFT JOIN t_hospital_dept hd
+		 ON h.`id`=hd.`hosp_id`
+		 LEFT JOIN t_department d
+		 ON hd.`dept_id`=d.`id`
+		 WHERE h.`id`= #{0} and d.level=1 and d.main_dept_id = #{1}
+		 group by d.id,d.name
+	</select>
+	<!-- 通过医院ID获取医生人数 -->
+	<select id="getDoctorsInDept" resultType="java.lang.Integer">
+		select IFNULL(a.main_count,0)+IFNULL(b.sub_count,0) count from
+			(select count(a.id) main_count,b.id deptId
+			from t_doctor a left join t_department b on a.dept_id=b.id
+			left join t_hospital c on a.hosp_id=c.id
+			where c.id=#{0}
+			group by b.id) a
+			left JOIN
+			(select IFNULL(count(a.id),0) sub_count,b.main_dept_id bid
+			from t_doctor a left join t_department b on a.dept_id=b.id
+			left join t_hospital c on a.hosp_id=c.id
+			where b.main_dept_id is not null and c.id=#{0}
+			group by b.main_dept_id) b on a.deptId=b.bid
+			where deptId=#{1}
+	</select>
+	<!-- 通过城市获取副科室 -->
+	<select id="getSubDeptsByCity" resultType="com.boco.modules.fdoc.vo.DepartmentVo">
+		SELECT
+		<include refid="deptColumns" /> 
+		 FROM t_hospital h
+		 LEFT JOIN t_hospital_dept hd
+		 ON h.`id`=hd.`hosp_id`
+		 LEFT JOIN t_department d
+		 ON hd.`dept_id`=d.`id`
+		 WHERE 
+		 <!--  h.city= #{0} and //暂时忽略地区-->
+		 d.level=1 and d.main_dept_id = #{1}
+		 group by d.id,d.name
+	</select>
+	<!-- 通过城市获取医生人数 -->
+	<select id="getDoctorsInDeptByCity" resultType="java.lang.Integer">
+		select IFNULL(a.main_count,0)+IFNULL(b.sub_count,0) count from
+			(select count(a.id) main_count,b.id deptId
+			from t_doctor a left join t_department b on a.dept_id=b.id
+			left join t_hospital c on a.hosp_id=c.id
+			<!-- where  c.city=#{0} //暂时忽略地区-->
+			group by b.id) a
+			left JOIN
+			(select IFNULL(count(a.id),0) sub_count,b.main_dept_id bid
+			from t_doctor a left join t_department b on a.dept_id=b.id
+			left join t_hospital c on a.hosp_id=c.id
+			where b.main_dept_id is not null <!-- and c.city=#{0} //暂时忽略地区-->
+			group by b.main_dept_id) b on a.deptId=b.bid
+			where deptId=#{1}
+	</select>
+</mapper>

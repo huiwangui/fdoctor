@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.FdoctorUPplanDao">  
+
+  <!-- 修改制定的随访计划 -->
+  <update id="updatePlan" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+  UPDATE t_up_plan
+  SET up_date=#{upDate}, 
+  task_level=#{taskLevel}, 
+  up_way=#{upWay},
+  task_target=#{taskTarget},
+  template_name=#{templateName},
+  disease_name=#{diseaseName}
+  where id=#{id}
+  </update>
+  
+  <!--制定随访计划 -->
+  <insert id="savePlan" parameterType="com.boco.modules.fdoc.vo.UpPlanVo" useGeneratedKeys="true"  keyProperty="id">
+   INSERT INTO t_up_plan (
+	health_file_code,
+	up_date,
+	task_level,
+	up_way,
+	task_target,
+	template_name,
+	disease_name
+      )
+   VALUES
+	(#{healthFileCode},
+    #{upDate},
+    #{taskLevel},
+    #{upWay},
+    #{taskTarget},
+    #{templateName},
+    #{diseaseName})
+  </insert>
+  
+  <!-- 获取已签约未完成随访计划列表最后一条记录 -->
+	<select id="getMaxDateUpdateNonexecution" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select a.person_name,a.health_file_code,a.id_card,a.sex,a.age,a.phone_number,c.task_level,c.up_way,
+		c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id,c.id
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status =0 and c.lookover=0
+		<if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+				  		OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+		order by up_date DESC limit 1	 
+	</select>
+	
+	<!-- 获取已签约未完成随访计划列表 -->
+	<select id="getListWithNonexecution" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select a.person_name,a.health_file_code,a.id_card,a.sex,a.age,a.phone_number,c.task_level,c.up_way,
+		c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id,c.id
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status =0 
+		<if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+				  		OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+		ORDER BY
+		c.up_date DESC	 
+	</select>
+	
+	<!-- 获取已签约未完成随访计划列表的总数 -->
+	<select id="getNoDoPlanNum" resultType="integer" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select count(a.health_file_code)
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status =0 
+		<if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+				  		OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+		 
+	</select>
+	
+	
+	
+	<!-- 处理随访计划 -->
+  <update id="lookoverPlan" parameterType="int">
+  UPDATE t_up_plan
+  SET lookover=1
+  where id=#{id}
+  </update>
+  
+  
+     <!-- 获取已签约未完成随访计划列表处理或者没处理 -->
+	<select id="getListWithNonexecutionIsLook" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select a.person_name,a.health_file_code,a.id_card,a.sex,a.age,a.phone_number,c.task_level,c.up_way,
+		c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id,c.id,c.lookover
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status =0
+		<if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+				  		OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>	
+		<if test="lookover==0">
+			and c.lookover=0
+		</if>
+		<if test="lookover==1">
+			and c.lookover=1
+		</if>
+		ORDER BY
+		c.up_date DESC	 
+	</select>  
+	
+	   <!-- 获取已签约未完成随访计划列表处理或者没处理 -->
+	<select id="getCountListWithNonexecutionIsLook" resultType="integer" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select count(a.health_file_code)
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status =0
+		<if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+				  		OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>	
+		<if test="lookover==0">
+			and c.lookover=0
+		</if>
+		<if test="lookover==1">
+			and c.lookover=1
+		</if>
+	</select>
+  
+</mapper>

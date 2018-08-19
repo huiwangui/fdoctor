@@ -1,0 +1,88 @@
+html {
+    font-size: 62.5%;
+}
+
+body {
+
+    font-family: 'Microsoft YaHei', 'Hiragino Sans GB', Helvetica, Arial,
+        'Lucida Grande', sans-serif;
+}
+
+body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, form, input, button, textarea, p, th, td {
+    margin: 0;
+    padding: 0;
+}
+
+td, th, caption {
+    font-size: 14px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+    font-size: 100%;
+}
+
+address, caption, cite, code, dfn, em, strong, th, var {
+    font-style: normal;
+    font-weight: normal;
+}
+
+a {
+    color: #00a7ff;
+    text-decoration: none;
+}
+
+img {
+    border: none;
+}
+
+ol, ul, li {
+    list-style: none;
+}
+
+input, textarea, select, button {
+    font: 14px Verdana, Helvetica, Arial, sans-serif;
+    outline: none;
+    border:none;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+input:-webkit-autofill { 
+    -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
+
+.wrap {
+    width: 100%;
+}
+
+.g-container{
+    width: 1200px;
+    margin:0 auto;
+}
+
+.g-left {
+    float: left;
+}
+.g-right {
+    float: right;
+}
+.wrap:after {
+    visibility: hidden;
+    display: block;
+    content: " ";
+    clear: both;
+    height: 0;
+}
+
+.bordure {
+    padding: 12px;
+    box-sizing: border-box;
+    margin-bottom: 0.9rem;
+}
+
+.b_20{
+    margin-top:15px!important;
+}

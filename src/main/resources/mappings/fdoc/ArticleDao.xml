@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.ArticleDao">
+	<sql id="artColumns">
+		a.id,
+		title,
+		person_id,
+		topic,
+		a.img,
+		content,
+		create_time,
+		comment_num,
+		b.nickname,
+		b.img userImg,
+		c.doc_name,
+		c.img docImg
+	</sql>
+	<!-- 文章列表 -->
+	<select	id="findAll" resultType="com.boco.modules.fdoc.vo.ArticleVo" parameterType="com.boco.modules.fdoc.vo.ArticleVo" >
+		SELECT 
+		id,
+		title,
+		person_id,
+		topic,
+		img,
+		content,
+		create_time,
+		comment_num
+		FROM t_article 
+		<where>
+			<if test="topic != null and topic !='' " >
+		      topic like CONCAT('%', #{topic}, '%') 
+		    </if>
+		    <if test="personId != null" >
+		      AND  person_id=#{personId}
+		    </if>
+		    <if test="id != null" >
+		      AND  id=#{id}
+		    </if>
+		</where>
+		order by create_time DESC
+	</select>
+	
+	<select	id="getArtCount" resultType="int" parameterType="com.boco.modules.fdoc.vo.ArticleVo" >
+		SELECT 
+		count(1)
+		FROM t_article 
+		where 1=1
+		 <if test="topic != null" >
+	    AND  topic like CONCAT('%', #{topic}, '%') 
+	    </if>
+		<if test="personId != null" >
+	    AND  person_id=#{personId}
+	    </if>
+	</select>
+	
+	
+	
+	
+	<select	id="findAllByTag" resultType="com.boco.modules.fdoc.vo.ArticleVo" parameterType="String">
+		SELECT 
+		id,
+		title,
+		person_id,
+		topic,
+		img,
+		content,
+		create_time,
+		comment_num
+		FROM t_article 
+		where topic like CONCAT('%', #{0}, '%')  
+		order by create_time DESC
+	</select>
+	<insert id="insertOne" parameterType="com.boco.modules.fdoc.model.ArticleEntity" useGeneratedKeys="true"  keyProperty="id" >
+	    insert into t_article (
+		title,
+		person_id,
+		topic,
+		img,
+		content,
+		create_time
+		)values(
+		#{title},#{personId},#{topic},#{img},#{content},#{createTime}
+		)
+	
+	</insert>
+	
+	<update id="updateNum" parameterType="String"   >
+	 update t_article set comment_num=comment_num+1 where id=#{0}
+	</update>
+	
+	<delete id="delArt" parameterType="com.boco.modules.fdoc.vo.ArticleVo" >
+	  delete from t_article where id=#{id} AND  person_id=#{personId}
+	</delete>
+</mapper>

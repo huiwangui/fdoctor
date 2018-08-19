@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.TestDao">
+	<select id="getRegionList" resultType="com.boco.modules.fdoc.model.SysRegionEntity" parameterType="com.boco.modules.fdoc.model.SysRegionEntity">
+		select region_code regionCode ,name,full_name fullName,parent_code from t_temp where full_name like '%四川%'
+		
+	</select>
+	
+	<update id="update" parameterType="com.boco.modules.fdoc.model.SysRegionEntity">
+		update t_temp set name = #{name}, id = #{id} where region_code = #{regionCode}
+	</update>
+</mapper>

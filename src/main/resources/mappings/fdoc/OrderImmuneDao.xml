@@ -1,0 +1,1081 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.OrderImmuneDao">
+	<!-- 查询某天的号源 -->
+	<select id="getOrderSourceByUid" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.model.BizOutpatientSourceEntity">
+	SELECT
+	clinic_date,clinic_time,remainder_number
+	FROM
+		t_biz_outpatient_source
+	WHERE
+		org_id = (
+			SELECT
+				d.org_id
+			FROM
+				t_user a,
+				t_person_information b,
+				t_user_doc_sign c,
+				t_doctor d
+			WHERE
+				a.person_id = b.person_id
+			AND b.person_id = c.person_id
+			AND c.doc_team_id = d.team_id
+			AND a.uid =  #{uid,jdbcType=VARCHAR}
+			LIMIT 1
+		)
+	AND clinic_date = #{clinicDate,jdbcType=DATE}
+	</select> 
+	<!-- 预约门诊号量加减 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.BizOutpatientSourceEntity">
+		UPDATE t_biz_outpatient_source
+		SET remainder_number = #{remainderNumber},
+		 current_number = #{currentNumber},
+		 version = version + 1
+		WHERE
+			clinic_date = #{clinicDate}
+			and clinic_time =#{clinicTime}
+			and org_id =#{orgId}
+		AND version = #{version}
+	</update>
+	<!-- 查询某天上午或者下午的号源 -->
+	<select id="getOrderSourceByOrderParamVo" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.model.BizOutpatientSourceEntity">
+	SELECT
+	id,clinic_date,clinic_time,current_number,remainder_number,version,org_id
+	FROM
+		t_biz_outpatient_source
+	WHERE
+		org_id = (
+			SELECT
+				d.org_id
+			FROM
+				t_user a,
+				t_person_information b,
+				t_user_doc_sign c,
+				t_doctor d
+			WHERE
+				a.person_id = b.person_id
+			AND b.person_id = c.person_id
+			AND c.doc_team_id = d.team_id
+			AND a.uid =  #{uid,jdbcType=VARCHAR}
+			LIMIT 1
+		)
+	AND clinic_date = #{clinicDate,jdbcType=DATE}
+	AND clinic_time=#{clinicTime,jdbcType=VARCHAR}
+	</select> 
+	
+	<!-- 查询号源 -->
+	<select id="getOrderSourceByOrderNumber" parameterType="com.boco.modules.fdoc.model.BizOutpatientSourceEntity" resultType="com.boco.modules.fdoc.model.BizOutpatientSourceEntity">
+	SELECT
+	id,
+	clinic_date,
+	clinic_time,
+	current_number,
+	remainder_number,
+	version,
+	org_id
+	FROM
+		t_biz_outpatient_source
+	WHERE
+		id = #{id,jdbcType=INTEGER}
+	</select> 
+	<!-- 查询免疫预约列表 -->
+	<select id="getOrderListByuid" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+	a.order_number,
+	a.create_time,
+	a.order_status,
+	a.patient_id,
+	b.clinic_date,
+	b.clinic_time
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b
+	WHERE
+		a.creator_uid = #{uid,jdbcType=VARCHAR}
+	AND a.order_status IN ("1", "2")
+	AND a.outpatient_source_id = b.id
+	ORDER BY a.create_time DESC
+	</select>
+	
+	<!-- 查询预约列表总数 -->
+	<select id="getOrderSumByuid" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+	a.order_number,
+	a.create_time,
+	a.order_status,
+	a.patient_id,
+	b.clinic_date,
+	b.clinic_time
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b
+	WHERE
+		a.creator_uid = #{0}
+	AND a.outpatient_source_id = b.id
+ 
+	</select>
+	<!-- 查询签约医院名称 -->
+	<select id="getHospitalByuid" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		e.org_name hospital_name,
+		e.address hospital_address
+	FROM
+		t_user a,
+		t_person_information b,
+		t_user_doc_sign c,
+		t_doctor d,
+      t_hospital e
+	WHERE
+		a.person_id = b.person_id
+	AND b.person_id = c.person_id
+	AND c.doc_team_id = d.team_id
+	AND a.uid = #{0}
+	and d.org_id=e.id
+	LIMIT 1
+	</select>
+	<!-- 查询签约人名字 -->
+	<select id="getPersonNameByPersonid" parameterType="string" resultType="string">
+	SELECT
+	person_name
+	FROM
+		t_person_information
+	WHERE
+		person_id =#{0}
+	</select>
+	<!-- 获取体检项目列表 -->
+	<select id="getPhysicalListByUid" parameterType="string" resultType="com.boco.modules.fdoc.model.PhysicalExaminationDictionaryEntity">
+	 SELECT
+		tj_name,tj_number
+	FROM
+		t_physical_examination_dictionary
+	</select>
+	<!-- 获取随访项目列表 -->
+	<select id="getFollowUpListByUid" parameterType="string" resultType="com.boco.modules.fdoc.model.FollowUpDictionaryEntity">
+	SELECT
+		fp_name,fp_number
+	FROM
+		t_follow_up_dictionary
+	</select>
+	<!-- 查询体检预约列表 -->
+	<select id="getPhysicalOrderListByuid" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.PhysicalExaminationOrderVo">
+	SELECT
+	order_number,
+	create_time,
+	clinic_time,
+	tj_name,
+	order_time,
+	order_status,
+	patient_id
+	FROM
+		t_physical_examination_order
+	WHERE
+		creator_uid = #{uid,jdbcType=VARCHAR}
+	AND order_status IN ("1", "2")
+	ORDER BY
+		create_time DESC
+
+	</select>
+	
+	<!-- 查询随访预约列表 -->
+	<select id="getFollowUpOrderList" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.FollowUpOrderVo">
+	SELECT
+	order_number,
+	create_time,
+	clinic_time,
+	fp_name,
+	order_time,
+	order_status,
+	patient_id
+	FROM
+		t_follow_up_order
+	WHERE
+		creator_uid = #{uid,jdbcType=VARCHAR}
+	AND order_status IN ("1", "2")
+	ORDER BY
+		create_time DESC
+
+	</select>
+	<!-- 查询体检预约列表总数 -->
+	<select id="getPhysicalOrderListSumByuid" parameterType="string" resultType="com.boco.modules.fdoc.vo.PhysicalExaminationOrderVo">
+	SELECT
+	order_number,
+	create_time,
+	clinic_time,
+	tj_name,
+	order_time,
+	order_status,
+	patient_id
+	FROM
+		t_physical_examination_order
+	WHERE
+		creator_uid = #{0}
+	</select>
+	<!-- 查询随访预约列表总数 -->
+	<select id="getFollowUpOrderSumByuid" parameterType="string" resultType="com.boco.modules.fdoc.vo.FollowUpOrderVo">
+	SELECT
+	order_number,
+	create_time,
+	clinic_time,
+	fp_name,
+	order_time,
+	order_status,
+	patient_id
+	FROM
+		t_follow_up_order
+	WHERE
+		creator_uid = #{0}
+	</select>
+	<!-- 查询历史预约免疫记录 医生端 -->
+	<select id="getImmuneOrderListOfHistoryByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+		SELECT
+			a.create_time,
+			a.patient_id,
+			b.clinic_date,
+			h.phone_number
+		FROM
+			t_biz_outpatient_order a,
+			t_biz_outpatient_source b,
+			t_doctor_user c,
+			t_doctor d,
+			t_user_doc_sign e,
+			t_user f,
+			t_person_information h
+		WHERE
+		<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{userName,jdbcType=VARCHAR}
+		AND f.uid = a.creator_uid
+		AND a.order_time < DATE(SYSDATE())
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	
+	<!-- 查询历史免疫记录总数 医生端 -->
+	<select id="getImmuneOrderListOfHistorySumByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+		SELECT
+			a.create_time,
+			a.patient_id,
+			b.clinic_date,
+			h.phone_number
+		FROM
+			t_biz_outpatient_order a,
+			t_biz_outpatient_source b,
+			t_doctor_user c,
+			t_doctor d,
+			t_user_doc_sign e,
+			t_user f,
+			t_person_information h
+		WHERE
+		<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{0}
+		AND f.uid = a.creator_uid
+		AND a.order_time < DATE(SYSDATE())
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+    <!-- 查询本周免疫预约列表 医生端 -->
+	<select id="getImmuneOrderListOfWeekdayByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{userName,jdbcType=VARCHAR} 
+		AND f.uid = a.creator_uid
+		AND a.order_time BETWEEN subdate(curdate(),date_format(curdate(),'%w')-1)
+		AND subdate(curdate(),date_format(curdate(),'%w')-7)
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	<!-- 查询今天未取消的免疫预约列表 医生端 -->
+	<select id="getImmuneOrderListOfDayByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{userName,jdbcType=VARCHAR} 
+		AND f.uid = a.creator_uid
+		AND a.order_time =DATE(SYSDATE())
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	<!-- 查询明天未取消的免疫预约列表 医生端 -->
+	<select id="getImmuneOrderListOfTomorrowByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{userName,jdbcType=VARCHAR} 
+		AND f.uid = a.creator_uid
+		AND a.order_time =date_add(DATE(sysdate()),INTERVAL 1 DAY)
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	<!-- 查询明天未取消的免疫预约列表总数 医生端 -->
+	<select id="getImmuneOrderListOfTomorrowSumByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{0} 
+		AND f.uid = a.creator_uid
+		AND a.order_time =date_add(DATE(sysdate()),INTERVAL 1 DAY)
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	<!-- 查询今天未取消的免疫预约列表总数 医生端 -->
+	<select id="getImmuneOrderListSumOfDayByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{0} 
+		AND f.uid = a.creator_uid
+		AND a.order_time =DATE(SYSDATE())
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	 <!-- 查询本周未取消的免疫预约列表总数 医生端 -->
+	<select id="getImmuneOrderListOfWeekdaySumByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+		AND a.outpatient_source_id = b.id
+		AND c.doctor_id = d.id
+		AND d.team_id = e.doc_team_id
+		AND e.person_id = h.person_id
+		AND f.person_id = h.person_id
+		AND c.user_name = #{0} 
+		AND f.uid = a.creator_uid
+		AND a.order_time BETWEEN DATE_SUB(
+			DATE(SYSDATE()),
+			INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+		)
+		AND date_add(
+			DATE_ADD(
+				DATE(SYSDATE()),
+				INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+			),
+			INTERVAL + 0  DAY
+		)
+		ORDER BY
+			a.create_time DESC]]>
+	</select>
+	<!-- 查询历史预约随访记录 医生端 -->
+	<select id="getFollowUpOrderListOfHistoryByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+	a.patient_id,a.create_time,a.order_time clinic_date,c.phone_number
+	FROM
+		t_follow_up_order a,
+	  t_user b,
+	  t_person_information c,
+	  t_doctor_user d,
+	  t_doctor e,
+	  t_user_doc_sign f
+	WHERE 
+	<![CDATA[a.order_time < DATE(SYSDATE())
+	and a.order_status !="2"
+	and a.creator_uid =b.uid
+	and b.person_id =c.person_id
+	and d.doctor_id=e.id
+	and e.team_id=f.doc_team_id
+	and c.person_id=f.person_id
+	and d.user_name=#{userName,jdbcType=VARCHAR}]]>
+	</select>
+	<!-- 查询历史随访记录总数 医生端 -->
+	<select id="getFollowUpOrderListOfHistorySumByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+	a.patient_id,a.create_time,a.order_time clinic_date,c.phone_number
+	FROM
+		t_follow_up_order a,
+	  t_user b,
+	  t_person_information c,
+	  t_doctor_user d,
+	  t_doctor e,
+	  t_user_doc_sign f
+	WHERE 
+	<![CDATA[a.order_time < DATE(SYSDATE())
+	and a.order_status !="2"
+	and a.creator_uid =b.uid
+	and b.person_id =c.person_id
+	and d.doctor_id=e.id
+	and e.team_id=f.doc_team_id
+	and c.person_id=f.person_id
+	and d.user_name=#{0}]]>
+	</select>
+	<!-- 查询本周随访预约列表 医生端 -->
+	<select id="getFollowUpOrderListOfWeekdayByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{userName,jdbcType=VARCHAR}
+	AND a.order_time BETWEEN DATE_SUB(
+		DATE(SYSDATE()),
+		INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+	)
+	AND date_add(
+		DATE_ADD(
+			DATE(SYSDATE()),
+			INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+		),
+		INTERVAL + 0 DAY
+	)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询今天未取消的随访预约列表 医生端 -->
+	<select id="getFollowUpOrderListOfDayByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{userName,jdbcType=VARCHAR}
+	AND a.order_time = DATE(SYSDATE())
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询明天未取消的随访预约列表 医生端 -->
+	<select id="getFollowUpOrderListOfTomorrowByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{userName,jdbcType=VARCHAR}
+	AND a.order_time = date_add(DATE(sysdate()),INTERVAL 1 DAY)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询明天未取消的随访预约列表总数 医生端 -->
+	<select id="getFollowUpOrderListSumOfTomorrowByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{0}
+	AND a.order_time = date_add(DATE(sysdate()),INTERVAL 1 DAY)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询今天未取消的随访预约列表总数 医生端 -->
+	<select id="getFollowUpOrderListSumOfDayByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{0}
+	AND a.order_time = DATE(SYSDATE())
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询本周随访预约列表总数 医生端 -->
+	<select id="getFollowUpOrderListSumOfWeekdayByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{0}
+	AND a.order_time BETWEEN DATE_SUB(
+		DATE(SYSDATE()),
+		INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+	)
+	AND date_add(
+		DATE_ADD(
+			DATE(SYSDATE()),
+			INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+		),
+		INTERVAL + 0  DAY
+	)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	
+	<!-- 查询本周未取消的体检预约列表 医生端 -->
+	<select id="getPhysicalExaminationOrderListOfWeekdayByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{userName,jdbcType=VARCHAR}
+	AND a.order_time BETWEEN DATE_SUB(
+		DATE(SYSDATE()),
+		INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+	)
+	AND date_add(
+		DATE_ADD(
+			DATE(SYSDATE()),
+			INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+		),
+		INTERVAL + 0   DAY
+	)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询今天未取消的体检预约列表 医生端 -->
+	<select id="getPhysicalExaminationOrderListOfDayByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{userName,jdbcType=VARCHAR}
+	AND a.order_time =DATE(SYSDATE())
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询明天未取消的体检预约列表 医生端 -->
+	<select id="getPhysicalExaminationOrderListOfTomorrowByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{userName,jdbcType=VARCHAR}
+	AND a.order_time =date_add(DATE(sysdate()),INTERVAL 1 DAY)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询明天未取消的体检预约列表总数 医生端 -->
+	<select id="getPhysicalExaminationOrderListSumOfTomorrowByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{0}
+	AND a.order_time =date_add(DATE(sysdate()),INTERVAL 1 DAY)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询今天未取消的体检预约列表总数 医生端 -->
+	<select id="getPhysicalExaminationOrderListSumOfDayByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{0}
+	AND a.order_time =DATE(SYSDATE())
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询本周未取消的体检预约列表总数 医生端 -->
+	<select id="getPhysicalExaminationOrderListSumOfWeekdayByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	and d.id=c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND c.user_name = #{0}
+	AND a.order_time BETWEEN DATE_SUB(
+		DATE(SYSDATE()),
+		INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+	)
+	AND date_add(
+		DATE_ADD(
+			DATE(SYSDATE()),
+			INTERVAL WEEKDAY(DATE(SYSDATE())) DAY
+		),
+		INTERVAL + 0  DAY
+	)
+	ORDER BY
+		a.create_time DESC]]>
+
+	</select>
+	<!-- 查询历史未取消的预约体检记录 医生端 -->
+	<select id="getPhysicalExaminationOrderListOfHistoryByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+	a.patient_id,a.create_time,a.order_time clinic_date,c.phone_number
+	FROM
+	  t_physical_examination_order a,
+	  t_user b,
+	  t_person_information c,
+	  t_doctor_user d,
+	  t_doctor e,
+	  t_user_doc_sign f
+	WHERE 
+	<![CDATA[a.order_time < DATE(SYSDATE())
+	and a.order_status !="2"
+	and a.creator_uid =b.uid
+	and b.person_id =c.person_id
+	and d.doctor_id=e.id
+	and e.team_id=f.doc_team_id
+	and c.person_id=f.person_id
+	and d.user_name=#{userName,jdbcType=VARCHAR}]]>
+	</select>
+	<!-- 查询历史未取消的预约体检记录总数 医生端 -->
+	<select id="getPhysicalExaminationOrderListSumOfHistoryByDoc" parameterType="string" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	SELECT
+	a.patient_id,a.create_time,a.order_time clinic_date,c.phone_number
+	FROM
+	  t_physical_examination_order a,
+	  t_user b,
+	  t_person_information c,
+	  t_doctor_user d,
+	  t_doctor e,
+	  t_user_doc_sign f
+	WHERE 
+	<![CDATA[a.order_time < DATE(SYSDATE())
+	and a.order_status !="2"
+	and a.creator_uid =b.uid
+	and b.person_id =c.person_id
+	and d.doctor_id=e.id
+	and e.team_id=f.doc_team_id
+	and c.person_id=f.person_id
+	and d.user_name=#{0}]]>
+	</select>
+	<!-- 查询预约体检详情 医生端 -->
+	<select id="getPhysicalExaminationOrderDetailByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	 SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.tj_name project_name,
+		h.phone_number,
+		h.current_address person_address,
+		f.address hospital_address,
+		f.org_name hospital_name
+	FROM
+		t_physical_examination_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h,
+		t_hospital f
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	AND d.id = c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND f.id = d.org_id
+ 
+	AND a.order_number = #{orderNumber,jdbcType=VARCHAR}
+	limit 1]]>
+	</select>
+	<!-- 查询预约随访详情 医生端 -->
+	<select id="getFollowUpOrderDetailByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	 SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		a.clinic_time,
+		a.order_time clinic_date,
+		a.fp_name project_name,
+		h.phone_number,
+		h.current_address person_address,
+		f.address hospital_address,
+		f.org_name hospital_name
+	FROM
+		t_follow_up_order a,
+		t_user b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_person_information h,
+		t_hospital f
+	WHERE
+	<![CDATA[a.order_status != "2"
+	AND a.creator_uid = b.uid
+	AND b.person_id = h.person_id
+	AND d.id = c.doctor_id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND f.id = d.org_id	 
+	AND a.order_number = #{orderNumber,jdbcType=VARCHAR}
+	limit 1]]>
+	</select>
+	<!-- 查询预约免疫详情 医生端 -->
+	<select id="getImmuneOrderDetailByDoc" parameterType="com.boco.modules.fdoc.vo.OrderParamVo" resultType="com.boco.modules.fdoc.vo.OrderImmuneVo">
+	 SELECT
+		a.order_number,
+		a.create_time,
+		a.order_status,
+		a.patient_id,
+		b.clinic_date,
+		b.clinic_time,
+		h.phone_number,
+	    j.address hospital_address,
+	    j.org_name hospital_name,
+	    h.current_address person_address
+	FROM
+		t_biz_outpatient_order a,
+		t_biz_outpatient_source b,
+		t_doctor_user c,
+		t_doctor d,
+		t_user_doc_sign e,
+		t_user f,
+		t_person_information h,
+	 t_hospital j
+	WHERE
+	<![CDATA[a.outpatient_source_id = b.id
+	AND c.doctor_id = d.id
+	AND d.team_id = e.doc_team_id
+	AND e.person_id = h.person_id
+	AND f.person_id = h.person_id
+	
+	AND f.uid = a.creator_uid
+	AND j.id = d.org_id
+	AND a.order_number = #{orderNumber,jdbcType=VARCHAR}
+	limit 1]]>
+	</select>
+</mapper>

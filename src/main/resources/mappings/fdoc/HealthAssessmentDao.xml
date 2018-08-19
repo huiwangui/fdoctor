@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.HealthAssessmentDao">
+	<sql id="Base_Column_List">
+	   id, doc_team_id, person_id, doc_id, exception_type, blood_suger, systolic_pressure, 
+	   diastolic_pressure, detection_result, remark, title, content, medication_guide, key_words, 
+	   assessment_time, create_time, status
+	</sql>
+	
+	<!-- 新增健康评估 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.HealthAssessmentEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into t_health_assessment (doc_team_id, person_id, 
+	      doc_id, exception_type, blood_suger, 
+	      systolic_pressure, diastolic_pressure, detection_result, 
+	      remark, title, content, 
+	      medication_guide, key_words, assessment_time, 
+	      create_time, status)
+	    values (#{docTeamId,jdbcType=VARCHAR}, #{personId,jdbcType=VARCHAR}, 
+	      #{docId,jdbcType=VARCHAR}, #{exceptionType,jdbcType=VARCHAR}, #{bloodSuger,jdbcType=DOUBLE}, 
+	      #{systolicPressure,jdbcType=DOUBLE}, #{diastolicPressure,jdbcType=DOUBLE}, #{detectionResult,jdbcType=VARCHAR}, 
+	      #{remark,jdbcType=VARCHAR}, #{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+	      #{medicationGuide,jdbcType=VARCHAR}, #{keyWords,jdbcType=VARCHAR}, #{assessmentTime,jdbcType=TIMESTAMP}, 
+	      #{createTime,jdbcType=TIMESTAMP}, #{status,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 修改健康评估 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.HealthAssessmentEntity">
+		update t_health_assessment
+	    <set>
+	      <if test="docTeamId != null">
+	        doc_team_id = #{docTeamId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="personId != null">
+	        person_id = #{personId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="docId != null">
+	        doc_id = #{docId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="exceptionType != null">
+	        exception_type = #{exceptionType,jdbcType=VARCHAR},
+	      </if>
+	      <if test="bloodSuger != null">
+	        blood_suger = #{bloodSuger,jdbcType=DOUBLE},
+	      </if>
+	      <if test="systolicPressure != null">
+	        systolic_pressure = #{systolicPressure,jdbcType=DOUBLE},
+	      </if>
+	      <if test="diastolicPressure != null">
+	        diastolic_pressure = #{diastolicPressure,jdbcType=DOUBLE},
+	      </if>
+	      <if test="detectionResult != null">
+	        detection_result = #{detectionResult,jdbcType=VARCHAR},
+	      </if>
+	      <if test="remark != null">
+	        remark = #{remark,jdbcType=VARCHAR},
+	      </if>
+	      <if test="title != null">
+	        title = #{title,jdbcType=VARCHAR},
+	      </if>
+	      <if test="content != null">
+	        content = #{content,jdbcType=VARCHAR},
+	      </if>
+	      <if test="medicationGuide != null">
+	        medication_guide = #{medicationGuide,jdbcType=VARCHAR},
+	      </if>
+	      <if test="keyWords != null">
+	        key_words = #{keyWords,jdbcType=VARCHAR},
+	      </if>
+	      <if test="assessmentTime != null">
+	        assessment_time = #{assessmentTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="createTime != null">
+	        create_time = #{createTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="status != null">
+	        status = #{status,jdbcType=VARCHAR},
+	      </if>
+	    </set>
+	    where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 获取健康评估列表 -->
+	<select id="getHealthAssessmentList" parameterType="com.boco.modules.fdoc.vo.HealthAssessmentVo" resultType="com.boco.modules.fdoc.vo.HealthAssessmentVo">
+		SELECT
+			a.*, b.person_name
+		FROM
+			t_health_assessment a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		WHERE
+			a.doc_team_id = #{docTeamId}
+		<if test="personId != null and personId != ''">
+			AND a.person_id = #{personId}
+		</if>
+		AND a.`status` = #{status}
+		order by a.create_time desc
+	</select>
+	
+	<!-- 获取健康评估记录数 -->
+	<select id="getHealthAssessmentCount" parameterType="com.boco.modules.fdoc.vo.HealthAssessmentVo" resultType="integer">
+		SELECT
+			count(a.id)
+		FROM
+			t_health_assessment a
+		WHERE
+			a.doc_team_id = #{docTeamId}
+		<if test="personId != null and personId != ''">
+			AND a.person_id = #{personId}
+		</if>
+		AND a.`status` = #{status}
+	</select>
+	
+	<!-- 居民端获取健康评估列表 -->
+	<select id="getHealthAssessmentListByUser" parameterType="com.boco.modules.fdoc.vo.HealthAssessmentVo" resultType="com.boco.modules.fdoc.vo.HealthAssessmentVo">
+		SELECT
+			a.*, b.person_name,MONTH(a.assessment_time)-1 monthTag,
+			c.doc_name, d.img
+		FROM
+			t_health_assessment a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		LEFT JOIN t_doctor c ON a.doc_id = c.id
+		LEFT JOIN t_doctor_user d on c.id = d.doctor_id
+		WHERE
+			a.person_id = #{personId}
+		AND a.`status` = #{status}
+		<if test="beginDate != null">
+			AND a.assessment_time &gt;= #{beginDate}
+		</if>
+		<if test="endDate != null">
+			AND a.assessment_time &lt;= #{endDate}
+		</if>
+		order by a.create_time desc
+	</select>
+	
+	<!-- 获取评估详情 -->
+	<select id="getHealthAssessmentDetail" parameterType="integer" resultType="com.boco.modules.fdoc.vo.HealthAssessmentVo">
+		SELECT
+			a.*, b.person_name,MONTH(a.assessment_time)-1 monthTag,
+			c.doc_name
+		FROM
+			t_health_assessment a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		LEFT JOIN t_doctor c ON a.doc_id = c.id
+		WHERE
+			a.id = #{id}
+	</select>
+</mapper>

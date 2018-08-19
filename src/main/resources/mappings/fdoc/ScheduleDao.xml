@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.ScheDao">
+
+	<sql id="scheColumns">
+		s.id,
+		s.type,
+		s.doc_id,
+		s.work_time,
+		s.number,
+		s.money,
+		s.period,
+		s.create_time,
+		s.update_time,
+		s.version
+	</sql>
+	<!-- 获取排班列表 -->
+	<select id="findScheList" parameterType="com.boco.modules.fdoc.vo.ScheduleVo" resultType="ScheduleEntity">
+		SELECT
+		<include refid="scheColumns" /> 
+		 FROM t_schedule s
+		 WHERE s.`doc_id`= #{docId} and s.`work_time` between #{beginTime} and #{endTime}
+		 order by work_time;
+	</select>
+	<select id="getByDocIdAndWorkTime" parameterType="com.boco.modules.fdoc.vo.ScheduleVo" resultType="ScheduleEntity">
+		select <include refid="scheColumns" /> 
+	 	FROM t_schedule s where doc_id = #{docId} and work_time=FROM_UNIXTIME(#{workDate}, '%Y-%m-%d') 
+	 	and (period=#{period} or period=0)
+	</select>
+	<select id="get" parameterType="string" resultType="ScheduleEntity">
+		select <include refid="scheColumns" />
+		FROM t_schedule s where s.id=#{id}
+	</select>
+	<update id="updateNum" parameterType="ScheduleEntity">
+		update t_schedule set number=#{number},version=version+1 where id=#{id} and version=#{version}
+	</update>
+</mapper>

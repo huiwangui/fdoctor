@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.PersonInformationDao">
+	<sql id="Base_Column_List" >
+	    person_id, person_code, family_id, custom_number, person_name, sex, date_of_birth, 
+	    id_card, phone_number, current_address, region_code, master_flag, unit, if_sign, 
+	    state, creator, jw_person_id, qq, wechat
+  	</sql>
+  	
+  	<!-- 新增居民 -->
+  	<insert id="insert" parameterType="com.boco.modules.fdoc.model.PersonInformationEntity" >
+	    insert into t_person_information (person_id, person_code, family_id, 
+	      custom_number, person_name, sex, 
+	      date_of_birth, id_card, phone_number, 
+	      current_address, region_code, master_flag, 
+	      unit, if_sign, state, creator,jw_person_id,qq,wechat
+	      )
+	    values (#{personId,jdbcType=VARCHAR}, #{personCode,jdbcType=VARCHAR}, #{familyId,jdbcType=VARCHAR}, 
+	      #{customNumber,jdbcType=VARCHAR}, #{personName,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, 
+	      #{dateOfBirth,jdbcType=DATE}, #{idCard,jdbcType=VARCHAR}, #{phoneNumber,jdbcType=VARCHAR}, 
+	      #{currentAddress,jdbcType=VARCHAR}, #{regionCode,jdbcType=VARCHAR}, #{masterFlag,jdbcType=VARCHAR}, 
+	      #{unit,jdbcType=VARCHAR}, #{ifSign,jdbcType=INTEGER}, #{state,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR},
+	      #{jwPersonId,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR}, #{wechat,jdbcType=VARCHAR}
+	      )
+	 </insert>
+	 
+	 <!-- 修改居民 -->
+	 <update id="updateByEntity" parameterType="com.boco.modules.fdoc.model.PersonInformationEntity">
+	 	update t_person_information
+	 	set
+	 		<!--建档时不能修改  person_id=#{personId,jdbcType=VARCHAR}, -->
+	 		person_code=#{personCode,jdbcType=VARCHAR},
+	 		family_id=#{familyId,jdbcType=VARCHAR},
+	 		custom_number=#{customNumber,jdbcType=VARCHAR},
+	 		person_name=#{personName,jdbcType=VARCHAR},
+	 		sex=#{sex,jdbcType=VARCHAR},
+	 		date_of_birth=#{dateOfBirth,jdbcType=DATE},
+	 		phone_number=#{phoneNumber,jdbcType=VARCHAR},
+	 		current_address=#{currentAddress,jdbcType=VARCHAR},
+	 		region_code=#{regionCode,jdbcType=VARCHAR},
+	 		master_flag= #{masterFlag,jdbcType=VARCHAR},
+	 		unit=#{unit,jdbcType=VARCHAR},
+	 		state=#{state,jdbcType=INTEGER},
+	 		creator=#{creator,jdbcType=VARCHAR},
+	 		jw_person_id=#{jwPersonId,jdbcType=VARCHAR},
+	 		qq=#{qq,jdbcType=VARCHAR},
+	 		wechat=#{wechat,jdbcType=VARCHAR}
+	 	where id_card=#{idCard,jdbcType=VARCHAR}
+	 </update>
+	 
+	 <!-- 新增居民 -->
+  	<insert id="insertPerson" parameterType="com.boco.modules.fdoc.vo.PersonInformationVo" >
+	    insert into t_person_information (person_id, person_code, family_id, 
+	      custom_number, person_name, sex, 
+	      date_of_birth, id_card, phone_number, 
+	      current_address, region_code, master_flag, 
+	      unit, if_sign, state, creator,jw_person_id,qq,wechat
+	      )
+	    values (#{personId,jdbcType=VARCHAR}, #{personCode,jdbcType=VARCHAR}, #{familyId,jdbcType=VARCHAR}, 
+	      #{customNumber,jdbcType=VARCHAR}, #{personName,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, 
+	      #{dateOfBirth,jdbcType=DATE}, #{idCard,jdbcType=VARCHAR}, #{phoneNumber,jdbcType=VARCHAR}, 
+	      #{currentAddress,jdbcType=VARCHAR}, #{regionCode,jdbcType=VARCHAR}, #{masterFlag,jdbcType=VARCHAR}, 
+	      #{unit,jdbcType=VARCHAR}, #{ifSign,jdbcType=INTEGER}, #{state,jdbcType=INTEGER}, #{creator,jdbcType=VARCHAR},
+	      #{jwPersonId,jdbcType=VARCHAR}, #{qq,jdbcType=VARCHAR}, #{wechat,jdbcType=VARCHAR}
+	      )
+	 </insert>
+	 
+	 <!-- 修改居民 -->
+	 <update id="updatePerson" parameterType="com.boco.modules.fdoc.vo.PersonInformationVo">
+	 	update t_person_information
+	 	set
+	 		person_id=#{personId,jdbcType=VARCHAR},
+	 		person_code=#{personCode,jdbcType=VARCHAR},
+	 		family_id=#{familyId,jdbcType=VARCHAR},
+	 		custom_number=#{customNumber,jdbcType=VARCHAR},
+	 		person_name=#{personName,jdbcType=VARCHAR},
+	 		sex=#{sex,jdbcType=VARCHAR},
+	 		date_of_birth=#{dateOfBirth,jdbcType=DATE},
+	 		phone_number=#{phoneNumber,jdbcType=VARCHAR},
+	 		current_address=#{currentAddress,jdbcType=VARCHAR},
+	 		region_code=#{regionCode,jdbcType=VARCHAR},
+	 		master_flag= #{masterFlag,jdbcType=VARCHAR},
+	 		unit=#{unit,jdbcType=VARCHAR},
+	 		state=#{state,jdbcType=INTEGER},
+	 		creator=#{creator,jdbcType=VARCHAR},
+	 		jw_person_id=#{jwPersonId,jdbcType=VARCHAR},
+	 		qq=#{qq,jdbcType=VARCHAR},
+	 		wechat=#{wechat,jdbcType=VARCHAR}
+	 	where id_card=#{idCard,jdbcType=VARCHAR}
+	 </update>
+	 
+	 <!-- 修改居民 2-->
+	 <update id="updatePerson2" parameterType="com.boco.modules.fdoc.vo.PersonInformationVo">
+	 	update t_person_information
+	 	set
+	 		id_card=#{idCard,jdbcType=VARCHAR},
+	 		person_id=#{personId,jdbcType=VARCHAR},
+	 		person_code=#{personCode,jdbcType=VARCHAR},
+	 		family_id=#{familyId,jdbcType=VARCHAR},
+	 		custom_number=#{customNumber,jdbcType=VARCHAR},
+	 		person_name=#{personName,jdbcType=VARCHAR},
+	 		sex=#{sex,jdbcType=VARCHAR},
+	 		date_of_birth=#{dateOfBirth,jdbcType=DATE},
+	 		phone_number=#{phoneNumber,jdbcType=VARCHAR},
+	 		current_address=#{currentAddress,jdbcType=VARCHAR},
+	 		region_code=#{regionCode,jdbcType=VARCHAR},
+	 		master_flag= #{masterFlag,jdbcType=VARCHAR},
+	 		unit=#{unit,jdbcType=VARCHAR},
+	 		state=#{state,jdbcType=INTEGER},
+	 		creator=#{creator,jdbcType=VARCHAR},
+	 		jw_person_id=#{jwPersonId,jdbcType=VARCHAR},
+	 		qq=#{qq,jdbcType=VARCHAR},
+	 		wechat=#{wechat,jdbcType=VARCHAR}
+	 	where person_id=#{personId,jdbcType=VARCHAR}
+	 </update>
+	  <!-- 修改居民 信息-->
+	 <update id="updatePersonInformation" parameterType="com.boco.modules.fdoc.vo.PersonInformationVo">
+	 	  update t_person_information
+		  <set >
+		      <if test="jwPersonId != null" >
+		        jw_person_id = #{jwPersonId,jdbcType=VARCHAR},
+		      </if>
+		      <if test="personName != null" >
+		        person_name = #{personName,jdbcType=VARCHAR},
+		      </if>
+		      <if test="personCode != null" >
+		        person_code = #{personCode,jdbcType=VARCHAR},
+		      </if>
+		      <if test="familyId != null" >
+		        family_id = #{familyId,jdbcType=VARCHAR},
+		      </if>
+		      <if test="customNumber != null" >
+		        custom_number = #{customNumber,jdbcType=VARCHAR},
+		      </if>
+		      <if test="sex != null" >
+		        sex = #{sex,jdbcType=VARCHAR},
+		      </if>
+		      <if test="dateOfBirth != null" >
+		        date_of_birth = #{dateOfBirth,jdbcType=DATE},
+		      </if>
+		      <if test="idCard != null" >
+		        id_card = #{idCard,jdbcType=VARCHAR},
+		      </if>
+		      <if test="phoneNumber != null" >
+		        phone_number = #{phoneNumber,jdbcType=VARCHAR},
+		      </if>
+		      <if test="currentAddress != null" >
+		        current_address = #{currentAddress,jdbcType=VARCHAR},
+		      </if>
+		      <if test="regionCode != null" >
+		        region_code = #{regionCode,jdbcType=VARCHAR},
+		      </if>
+		      <if test="masterFlag != null" >
+		        master_flag = #{masterFlag,jdbcType=VARCHAR},
+		      </if>
+		      <if test="unit != null" >
+		        unit = #{unit,jdbcType=VARCHAR},
+		      </if>
+		      <if test="ifSign != null" >
+		        if_sign = #{ifSign,jdbcType=INTEGER},
+		      </if>
+		      <if test="state != null" >
+		        state = #{state,jdbcType=INTEGER},
+		      </if>
+		      <if test="creator != null" >
+		        creator = #{creator,jdbcType=VARCHAR},
+		      </if>
+		      <if test="qq != null" >
+		        qq = #{qq,jdbcType=VARCHAR},
+		      </if>
+		      <if test="wechat != null" >
+		        wechat = #{wechat,jdbcType=VARCHAR},
+		      </if>
+		    </set>
+		    where person_id = #{personId,jdbcType=VARCHAR}
+	 </update>
+  	
+  	<!-- 医生端扫健康卡获取居民信息 -->
+  	<select id="getPersonInfoByIdCard" parameterType="com.boco.modules.fdoc.model.PersonInformationEntity" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+  		select <include refid="Base_Column_List"/>,
+  		DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+	 	from t_person_information
+  		where id_card = #{idCard}
+  	</select>
+  	
+	<!-- 根据居民personId查询居民信息 -->
+	<select id="getPersonInformationByPesronId" parameterType="string" resultType="com.boco.modules.fdoc.model.PersonInformationEntity">
+	    SELECT  
+	     <include refid="Base_Column_List"/>
+	    FROM t_person_information  where  person_id = #{0}
+	</select>
+	
+	<!-- 根据居民personId查询居民信息 -->
+	<select id="getPersonInformationByJwPesronId" parameterType="string" resultType="com.boco.modules.fdoc.model.PersonInformationEntity">
+	    SELECT  
+	     <include refid="Base_Column_List"/>
+	    FROM t_person_information  where  jw_person_id = #{0}
+	</select>
+	
+	<!-- 根据家庭ID获取家庭成员 -->
+	<select id="getFamilyMember" parameterType="string" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		select <include refid="Base_Column_List"/>,
+		DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		 from t_person_information
+		where family_id = #{0}
+	</select>
+	
+	<!-- 根据身份证和姓名获取居民信息 -->
+	<select id="getPersonInfoByIdcardAndName" parameterType="string" resultType="com.boco.modules.fdoc.model.PersonInformationEntity">
+		select <include refid="Base_Column_List"/>
+		from t_person_information
+		where id_card = #{0} and person_name = #{1}
+	</select>
+	<!-- 根据身份证获取居民信息 -->
+	<select id="getPersonInfoByIdcardOnly" parameterType="string" resultType="com.boco.modules.fdoc.model.PersonInformationEntity">
+		select <include refid="Base_Column_List"/>
+		from t_person_information
+		where id_card = #{0}  limit 1
+	</select>
+	
+	<!-- 查询户主信息 -->
+	<select id="getMasterInfo" parameterType="string" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		select <include refid="Base_Column_List"/>,
+		DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		from t_person_information
+		where family_id = #{0} and master_flag = '1'
+	</select>
+	<!-- 查询居民简单信息及与他签约的医生团队队长电话号码 -->
+	<select id="getSimplePersonInfoByPersonId" parameterType="string" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		 SELECT
+			a.person_name,
+			a.id_card,
+			a.sex,
+			a.phone_number,
+			c.phone_number doc_mobile,
+			DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(a.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		FROM
+			t_person_information a,
+			t_user_doc_sign b,
+			t_doctor c
+		WHERE
+			a.person_id = b.person_id
+		AND b.doc_team_id = c.team_id
+		AND c.leader_flag = '1'
+		AND a.person_id = #{personId}
+	</select>
+	
+	<!-- 查询居民详细信息 -->
+	<select id="getPersonDetailByPersonId" parameterType="string" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+			a.*, DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(a.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age,
+			b.height,
+			b.weight,
+			b.img,
+			b.uid
+		FROM
+			t_person_information a
+		LEFT JOIN t_user b ON a.person_id = b.person_id
+		WHERE
+			a.person_id = #{0}
+	</select>
+	
+	<!-- 根据uid查询居民详细信息 -->
+	<select id="getPersonDetailByUId" parameterType="string" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+			a.*, DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(a.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age,
+			b.height,
+			b.weight,
+			b.img,
+			b.uid
+		FROM
+			t_person_information a
+		LEFT JOIN t_user b ON a.person_id = b.person_id
+		WHERE
+			b.uid = #{0}
+	</select>
+	
+	<!-- 查询居民详细信息 -->
+	<select id="getPersonDetailByJwPersonId" parameterType="string" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+			a.*, DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(a.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age,
+			b.height,
+			b.weight,
+			b.img,
+			b.uid
+		FROM
+			t_person_information a
+		LEFT JOIN t_user b ON a.person_id = b.person_id
+		WHERE
+			a.jw_person_id = #{0}
+	</select>
+	
+	<!-- 获取家庭的人员总数 -->
+	<select id="getMemberCountInFamily" parameterType="string" resultType="integer">
+		select count(person_id) from t_person_information where family_id = #{0}
+	</select>
+	<select id="getPersonInformationByUid" parameterType="string" resultType="com.boco.modules.fdoc.model.PersonInformationEntity">
+		SELECT
+			 person_id,person_name
+		FROM
+			t_person_information
+		WHERE
+			family_id = (
+				SELECT
+					a.family_id
+				FROM
+					t_person_information a,
+					t_user b
+				WHERE
+					a.person_id = b.person_id
+				AND b.uid = #{uid}
+			)
+	</select>
+	
+	<!-- 根据区划查询居民人数 -->
+	<select id="getPersonCountByRegion" parameterType="com.boco.modules.fdoc.vo.PersonInformationVo" resultType="integer">
+		select count(person_id) from t_person_information
+		<where>
+			<if test="regionCode != null and regionCode != ''">
+				region_code LIKE CONCAT(#{regionCode},'%')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 删除居民 -->
+	<delete id="deletePerson" parameterType="string">
+		delete from t_person_information where person_id = #{0}
+	</delete>
+	
+	<!-- 重置户主标识 -->
+	<update id="resetMaster" parameterType="string">
+		update t_person_information set
+			master_flag=null
+		where family_id=#{familyId,jdbcType=VARCHAR}
+	</update>
+	<!-- 设置户主 -->
+	<update id="setMaster" parameterType="string">
+		update t_person_information set
+			master_flag=1
+		where id_card=#{idCard,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 根据居民身份证获取户主 -->
+	<select id="getFamilyId" parameterType="string" resultType="string">
+		select family_id from t_person_information
+		where id_card=#{idCard}
+	</select>
+	
+	<!-- 根据居民身份证获取户主 -->
+	<select id="getPersonIdByJw" parameterType="string" resultType="string">
+		select person_id from t_person_information
+		where jw_person_id=#{0}
+	</select>
+	
+	<!-- 获取解约记录列表 -->
+	<select id="getPersonInformationVoListByDocTeamId" parameterType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+			b.person_id,
+			b.person_name,
+			b.id_card,
+			b.sex,
+			b.current_address,
+			b.unit,
+			b.phone_number,
+			a.`status`,
+			DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(b.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		FROM
+			t_surrender_request a,
+			t_person_information b
+		WHERE
+			a.person_id = b.person_id
+		and a.doc_team_id= #{docTeamId}
+		<if test="status != null and status != ''">
+		 and a.status = #{status} 
+		</if>
+	</select>
+	
+	<!-- 获取解约记录列表总数 -->
+	<select id="getPersonInformationVoListCountByDocTeamId" parameterType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" resultType="int">
+		SELECT
+		 count(*)
+		FROM
+			t_surrender_request a,
+			t_person_information b
+		WHERE
+			a.person_id = b.person_id
+		and a.doc_team_id= #{docTeamId}
+		<if test="status != null and status != ''">
+		 and a.status = #{status} 
+		</if>
+	</select>
+</mapper>

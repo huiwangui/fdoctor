@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.HealthCheckDao">
+	<!-- 获取体检预约列表 -->
+	<select id="getHealthCheckList" parameterType="com.boco.modules.fdoc.vo.HealthCheckVo" resultType="com.boco.modules.fdoc.vo.HealthCheckVo">
+		select a.id,a.healthcheck_num,a.id_card,a.pay_type,a.check_type,a.doc_id,a.hosp_id,
+		a.check_date,UNIX_TIMESTAMP(a.check_date)*1000 timeStamp,b.person_name checkerName,d.name hospName,a.pay_status,a.status
+		 from t_healthcheck a left join t_resident b on a.id_card=b.id_card
+		left join t_doctor c on a.doc_id=c.id
+		 left join t_hospital d on a.hosp_id=d.id
+		<where>
+			<if test="checkType != null and checkType != ''">
+			 a.check_type=#{checkType}
+			</if>
+			<if test="docUid != null and docUid != ''">
+			 AND c.doc_uid=#{docUid}
+			</if>
+			<if test="idCard != null and idCard != ''">
+			AND a.id_card=#{idCard}
+			</if>
+			<if test="hospId != null and hospId != ''">
+			AND a.hosp_id=#{hospId}
+			</if>
+			<if test="checkDate != null">
+			AND a.check_date=#{checkDate}
+			</if>
+			<if test="status != null and status != ''">
+			AND a.status in (${status})
+			</if>
+			<if test="uid != null and uid != ''">
+			AND a.uid=#{uid}
+			</if>
+		</where>
+	</select>
+	<!-- 新增体检预约 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.HealthCheckEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into t_healthcheck(id_card,pay_type,check_type,doc_id,hosp_id,check_date,create_time,status,uid,pay_status)
+		values (#{idCard},#{payType},#{checkType},#{docId},#{hospId},#{checkDate},#{createTime},#{status},#{uid},#{payStatus})
+	</insert>
+	<!-- 新增成功后修改订单号 -->
+	<update id="updateNum" parameterType="com.boco.modules.fdoc.model.HealthCheckEntity">
+		update t_healthcheck set healthcheck_num=#{healthcheckNum} where id=#{id} 
+	</update>
+	<!-- 查看已预约的体检记录 -->
+	<select id="getBookedHealthCheck" parameterType="com.boco.modules.fdoc.model.HealthCheckEntity" resultType="com.boco.modules.fdoc.vo.HealthCheckVo">
+		select a.id,a.healthcheck_num,a.id_card,a.pay_type,a.check_type,a.doc_id,a.hosp_id,
+		a.check_date,UNIX_TIMESTAMP(a.check_date)*1000 timeStamp,b.person_name checkerName,d.name hospName,a.pay_status
+		 from t_healthcheck a left join t_resident b on a.id_card=b.id_card
+		left join t_doctor c on a.doc_id=c.id
+		left join t_hospital d on a.hosp_id=d.id
+		where a.id=#{id}
+	</select>
+	<!-- 根据体检类型查看当前家庭可以进行预约的人员 -->
+	<!-- 修改预约状态 -->
+	<update id="updateBookingStatus">
+		update t_healthcheck set status=#{1} where id=#{0}
+	</update>
+</mapper>

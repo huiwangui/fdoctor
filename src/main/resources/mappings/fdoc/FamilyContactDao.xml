@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.FamilyContactDao">
+
+	<sql id="familyContactColumns">
+		family_id,phone_number,qq_number,wechat_number
+	</sql>
+
+	<!-- 新建家庭联系方式 -->
+	<insert id="addFamilyContact" parameterType="com.boco.modules.fdoc.vo.FamilyContactInfoVo">
+		insert into t_family_contact_info(family_id,phone_number,qq_number,wechat_number)
+		values (#{familyId,jdbcType=VARCHAR},#{phoneNumber,jdbcType=VARCHAR},
+				#{qqNumber,jdbcType=VARCHAR},#{wechatNumber,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 修改家庭联系方式 -->
+	<update id="updateFamilyContact" parameterType="com.boco.modules.fdoc.vo.FamilyContactInfoVo">
+		update t_family_contact_info 
+		set 
+			phone_number=#{phoneNumber,jdbcType=VARCHAR},
+			qq_number=#{qqNumber,jdbcType=VARCHAR},
+			wechat_number=#{wechatNumber,jdbcType=VARCHAR}
+		where family_id=#{familyId}
+	</update>
+	
+	<!-- 查询家庭联系方式 -->
+	<select id="getContactInfo" parameterType="String" resultType="com.boco.modules.fdoc.model.FamilyContactInfoEntity">
+		select <include refid="familyContactColumns"/> from t_family_contact_info
+		where family_id=#{familyId}
+		group by family_id
+	</select>
+	
+	<!-- 删除家庭联系方式 -->
+	<delete id="deleteContactInfo" parameterType="String">
+		delete from t_family_contact_info where family_id=#{familyId}
+	</delete>
+	
+	
+</mapper>

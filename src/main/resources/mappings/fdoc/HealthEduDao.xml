@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.HealthEduDao">
+	
+	<!-- 获取健康教育总条数  团队-->
+	<select	id="getCount"  parameterType="com.boco.modules.fdoc.vo.HealthEduVo" resultType="Integer">
+		SELECT 
+		 count(*)
+		FROM t_health_edu 
+		where team_id = #{teamId}
+	</select>
+	
+	<!-- 获取健康教育总条数 -->
+	<select	id="getCountAll"  parameterType="com.boco.modules.fdoc.vo.HealthEduVo"  resultType="Integer">
+		SELECT 
+		 count(*)
+		FROM t_health_edu
+		ORDER BY organize_time ASC
+	</select>
+	
+	<!-- 获取健康教育列表 团队 -->
+	<select	id="getEduList"  parameterType="com.boco.modules.fdoc.vo.HealthEduVo" resultType="com.boco.modules.fdoc.vo.HealthEduVo">
+		SELECT *
+		FROM t_health_edu 
+		where 1=1
+			<if test="teamId != null">
+			AND	team_id = #{teamId}
+			</if>
+		ORDER BY organize_time ASC
+	</select>
+	
+	<!-- 根据健康教育id获取健康教育 -->
+	<select	id="getEduById"  parameterType="INTEGER" resultType="com.boco.modules.fdoc.model.HealthEduEntity">
+		SELECT *
+		FROM t_health_edu 
+		where id=#{id}
+	</select>
+	
+	<!-- 根据健康教育theme获取健康教育 -->
+	<select	id="getEduByTheme"  parameterType="com.boco.modules.fdoc.vo.HealthEduVo" resultType="com.boco.modules.fdoc.vo.HealthEduVo">
+		SELECT *
+		FROM t_health_edu 
+		where theme like #{theme}
+		and team_id=#{teamId}
+	</select>
+	<!-- 获取健康教育thrme总数 -->
+	<select	id="getCountByTheme"  parameterType="com.boco.modules.fdoc.vo.HealthEduVo" resultType="INTEGER">
+		SELECT count(*)
+		FROM t_health_edu 
+		where theme like #{theme}
+		and team_id=#{teamId}
+	</select>
+	
+	<!-- 删除健康档案 -->
+	<delete id="deleteEduById" parameterType="INTEGER">
+		delete from t_health_edu 
+		where id=#{id}
+	</delete>
+	
+	<!-- 新建健康档案 -->
+	<insert id="saveNewEdu" parameterType="com.boco.modules.fdoc.model.HealthEduEntity">
+		insert into t_health_edu(organize_time,organizer,organize_way,address,theme,theme_day,crowd_type,crowd_num,
+								datum_type,datum_num,activity_info,summary,cognitive,team_id,create_time,create_by,
+								update_time,update_by)
+			values (#{organizeTime,jdbcType=DATE},#{organizer,jdbcType=VARCHAR},#{organizeWay,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},#{theme,jdbcType=VARCHAR}
+					,#{themeDay,jdbcType=VARCHAR},#{crowdType,jdbcType=VARCHAR},#{crowdNum,jdbcType=VARCHAR},#{datumType,jdbcType=VARCHAR},#{datumNum,jdbcType=VARCHAR}
+					,#{activityInfo,jdbcType=VARCHAR},#{summary,jdbcType=VARCHAR},#{cognitive,jdbcType=VARCHAR},#{teamId,jdbcType=VARCHAR},#{createTime,jdbcType=DATE}
+					,#{createBy,jdbcType=VARCHAR},#{updateTime,jdbcType=DATE},#{updateBy,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 修改健康档案 -->
+	<update id="updateEdu" parameterType="com.boco.modules.fdoc.model.HealthEduEntity">
+		update t_health_edu
+		set organize_time=#{organizeTime,jdbcType=DATE},
+			organizer=#{organizer,jdbcType=VARCHAR},
+			organize_way=#{organizeWay,jdbcType=VARCHAR},
+			address=#{address,jdbcType=VARCHAR},
+			theme=#{theme,jdbcType=VARCHAR},
+			theme_day=#{themeDay,jdbcType=VARCHAR},
+			crowd_type=#{crowdType,jdbcType=VARCHAR},
+			crowd_num=#{crowdNum,jdbcType=VARCHAR},
+			datum_type=#{datumType,jdbcType=VARCHAR},
+			datum_num=#{datumNum,jdbcType=VARCHAR},
+			activity_info=#{activityInfo,jdbcType=VARCHAR},
+			summary=#{summary,jdbcType=VARCHAR},
+			cognitive=#{cognitive,jdbcType=VARCHAR},
+			team_id=#{teamId,jdbcType=VARCHAR},
+			update_time=#{updateTime,jdbcType=DATE},
+			update_by=#{updateBy,jdbcType=VARCHAR}
+		where id=#{id,jdbcType=INTEGER}
+	</update>
+</mapper>

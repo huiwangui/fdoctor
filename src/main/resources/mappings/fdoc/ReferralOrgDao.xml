@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.ReferralOrgDao">
+	<sql id="Base_Column_List" >
+		id, org_name, org_code, create_time, update_time
+	</sql>
+	
+	<!-- 获取双向转诊转入、转出机构列表 -->
+	<select id="getReferralOrgList" parameterType="com.boco.modules.fdoc.model.ReferralOrgEntity" resultType="com.boco.modules.fdoc.model.ReferralOrgEntity">
+		select <include refid="Base_Column_List"/> from t_referral_org
+		<where>
+			<if test="orgName != null and orgName != ''">
+				org_name LIKE CONCAT('%',#{orgName},'%')
+			</if>
+		</where>
+	</select>
+	
+	<!-- 获取双向转诊转入、转出机构总数 -->
+	<select id="getReferralOrgCount" parameterType="com.boco.modules.fdoc.model.ReferralOrgEntity" resultType="integer">
+		select count(id) from t_referral_org
+		<where>
+			<if test="orgName != null and orgName != ''">
+				org_name LIKE CONCAT('%',#{orgName},'%')
+			</if>
+		</where>
+	</select>
+</mapper>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.PersonDeseaseInfoDao">
+
+	<sql id="Base_Column_List" >
+		person_id, hyper_flag, diabetes_flag, child_flag, major_psychosis_flag,oldm_flag,adult_flag,maternal_flag, create_time,
+		update_time
+	</sql>
+	<!-- 获取某人的慢病标识 -->
+	<select id="get" parameterType="string" resultType="com.boco.modules.fdoc.model.PersonDeseaseInfoEntity">
+		select <include refid="Base_Column_List"/> from t_person_desease_info
+		where person_id = #{0}
+	</select>
+	
+	<!-- 新增 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.PersonDeseaseInfoEntity">
+		insert into t_person_desease_info (person_id, hyper_flag, diabetes_flag, 
+	      child_flag, major_psychosis_flag,oldm_flag,adult_flag,maternal_flag, create_time, 
+	      update_time)
+	    values (#{personId,jdbcType=VARCHAR}, #{hyperFlag,jdbcType=VARCHAR}, #{diabetesFlag,jdbcType=VARCHAR}, 
+	      #{childFlag,jdbcType=VARCHAR}, #{majorPsychosisFlag,jdbcType=VARCHAR},#{oldmFlag,jdbcType=VARCHAR},#{adultFlag,jdbcType=VARCHAR},#{maternalFlag,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+	      #{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.PersonDeseaseInfoEntity">
+		update t_person_desease_info
+	    set hyper_flag = #{hyperFlag,jdbcType=VARCHAR},
+	      diabetes_flag = #{diabetesFlag,jdbcType=VARCHAR},
+	      child_flag = #{childFlag,jdbcType=VARCHAR},
+	      major_psychosis_flag = #{majorPsychosisFlag,jdbcType=VARCHAR},
+	      update_time = #{updateTime,jdbcType=TIMESTAMP}
+	    where person_id = #{personId,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 修改某人的标签 -->
+	<update id="updateFlag" parameterType="com.boco.modules.fdoc.vo.PersonDeseaseInfoVo">
+		update t_person_desease_info
+		<set>
+		   <if test="hyperFlag != null and hyperFlag != ''">
+		      hyper_flag = #{hyperFlag,jdbcType=VARCHAR},
+		   </if>
+		   <if test="diabetesFlag != null and diabetesFlag != ''">
+		   	 diabetes_flag = #{diabetesFlag,jdbcType=VARCHAR},
+		   </if>
+		   <if test="childFlag != null and childFlag != ''">
+		   	 child_flag = #{childFlag,jdbcType=VARCHAR},
+		   </if>
+		   <if test="majorPsychosisFlag != null and majorPsychosisFlag != ''">
+		   	  major_psychosis_flag = #{majorPsychosisFlag,jdbcType=VARCHAR},	
+		   </if>
+		   <if test="oldmFlag != null and oldmFlag != ''">
+		  	 oldm_flag =#{oldmFlag,jdbcType=VARCHAR},
+		   </if>
+		   <if test="adultFlag != null and adultFlag != ''">
+		   	  adult_flag = #{adultFlag,jdbcType=VARCHAR},
+		   </if>
+		   <if test="maternalFlag != null and maternalFlag != ''">
+		  	  maternal_flag = #{maternalFlag,jdbcType=VARCHAR},
+		   </if>
+		   <if test="updateTime != null" >
+	          update_time = #{updateTime,jdbcType=TIMESTAMP},
+	      </if>
+		</set>
+		person_id = #{personId,jdbcType=VARCHAR}	     
+	</update>
+</mapper>

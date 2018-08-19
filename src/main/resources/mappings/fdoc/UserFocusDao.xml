@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.UserFocusDao">
+	
+    <sql id="userFocusColumns">
+		uid,type,obj_id,obj_name,focus_time,cancel_time,status,remark
+    </sql>
+	
+	<!-- 插入用户关注信息-->
+	<insert id="insert">
+		insert into t_user_focus(
+			<include refid="userFocusColumns"/>
+		) VALUES (
+			#{uid}, 
+			#{type},
+			#{objId},
+			#{objName},
+			SYSDATE(),
+			#{cancelTime},
+			#{status},
+			#{remark}
+		)
+	</insert>
+	
+	<!-- 修改状态(关注/取消关注)-->
+	<update id="changeStatus" parameterType="UserFocusEntity">
+		update t_user_focus set status = #{status},cancel_time = #{cancelTime},remark = #{remark}
+		where uid = #{uid} and type = #{type} and obj_id = #{objId}
+	</update>
+	
+	<select id="getCount" parameterType="UserFocusEntity" resultType="integer">
+		select count(id) from t_user_focus where uid = #{uid} and type = #{type} and obj_id = #{objId} and status!=2
+	</select>
+	
+</mapper>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.ReferralHospitalizationDao">
+	<sql id="Base_Column_List" >		 
+		id, referral_code, person_id, person_name, sex, age, date_of_birth, id_card, address, 
+	    phone_number, urgency, patient_card_type, patient_card_number, impression, summary, 
+	    history, treatment_situation, refferral_purpose, referral_reason, main_inspection_results, 
+	    pool_flag, file_code, patients_identification_number, hospitalization_patients_identification_number, 
+	    rehabilitation_suggestion, apply_date, apply_hospital_code, apply_hospital_name, 
+	    item_hospital_code, item_hospital_name, long_term_testament, imaging_report, inspection_and_test, 
+	    admission_record, course_record, operation_record, stat_order, others, filling_flag, 
+	    filling_reason, apply_doctor_id_card, apply_doctor_name, real_referral_date, status, 
+	    create_time, creator
+	</sql>
+  
+	<!-- 新增住院转诊申请 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.ReferralHospitalizationEntity" useGeneratedKeys="true" keyProperty="id">
+	    insert into t_referral_hospitalization (id, referral_code, person_id, 
+	      person_name, sex, age, 
+	      date_of_birth, id_card, address, 
+	      phone_number, urgency, patient_card_type, 
+	      patient_card_number, impression, summary, 
+	      history, treatment_situation, refferral_purpose, 
+	      referral_reason, main_inspection_results, 
+	      pool_flag, file_code, patients_identification_number, 
+	      hospitalization_patients_identification_number, rehabilitation_suggestion, 
+	      apply_date, apply_hospital_code, apply_hospital_name, 
+	      item_hospital_code, item_hospital_name, long_term_testament, 
+	      imaging_report, inspection_and_test, admission_record, 
+	      course_record, operation_record, stat_order, 
+	      others, filling_flag, filling_reason, 
+	      apply_doctor_id_card, apply_doctor_name, real_referral_date, 
+	      status, create_time, creator
+	      )
+	    values (#{id,jdbcType=INTEGER}, #{referralCode,jdbcType=VARCHAR}, #{personId,jdbcType=VARCHAR}, 
+	      #{personName,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, 
+	      #{dateOfBirth,jdbcType=DATE}, #{idCard,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+	      #{phoneNumber,jdbcType=VARCHAR}, #{urgency,jdbcType=VARCHAR}, #{patientCardType,jdbcType=VARCHAR}, 
+	      #{patientCardNumber,jdbcType=VARCHAR}, #{impression,jdbcType=VARCHAR}, #{summary,jdbcType=VARCHAR}, 
+	      #{history,jdbcType=VARCHAR}, #{treatmentSituation,jdbcType=VARCHAR}, #{refferralPurpose,jdbcType=VARCHAR}, 
+	      #{referralReason,jdbcType=VARCHAR}, #{mainInspectionResults,jdbcType=VARCHAR}, 
+	      #{poolFlag,jdbcType=VARCHAR}, #{fileCode,jdbcType=VARCHAR}, #{patientsIdentificationNumber,jdbcType=VARCHAR}, 
+	      #{hospitalizationPatientsIdentificationNumber,jdbcType=VARCHAR}, #{rehabilitationSuggestion,jdbcType=VARCHAR}, 
+	      #{applyDate,jdbcType=DATE}, #{applyHospitalCode,jdbcType=VARCHAR}, #{applyHospitalName,jdbcType=VARCHAR}, 
+	      #{itemHospitalCode,jdbcType=VARCHAR}, #{itemHospitalName,jdbcType=VARCHAR}, #{longTermTestament,jdbcType=VARCHAR}, 
+	      #{imagingReport,jdbcType=VARCHAR}, #{inspectionAndTest,jdbcType=VARCHAR}, #{admissionRecord,jdbcType=VARCHAR}, 
+	      #{courseRecord,jdbcType=VARCHAR}, #{operationRecord,jdbcType=VARCHAR}, #{statOrder,jdbcType=VARCHAR}, 
+	      #{others,jdbcType=VARCHAR}, #{fillingFlag,jdbcType=VARCHAR}, #{fillingReason,jdbcType=VARCHAR}, 
+	      #{applyDoctorIdCard,jdbcType=VARCHAR}, #{applyDoctorName,jdbcType=VARCHAR}, #{realReferralDate,jdbcType=DATE}, 
+	      #{status,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}
+	      )
+	</insert>
+	
+	<!-- 修改住院转诊申请 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.ReferralHospitalizationEntity">
+	    update t_referral_hospitalization
+	    set referral_code = #{referralCode,jdbcType=VARCHAR},
+	      person_id = #{personId,jdbcType=VARCHAR},
+	      person_name = #{personName,jdbcType=VARCHAR},
+	      sex = #{sex,jdbcType=VARCHAR},
+	      age = #{age,jdbcType=INTEGER},
+	      date_of_birth = #{dateOfBirth,jdbcType=DATE},
+	      id_card = #{idCard,jdbcType=VARCHAR},
+	      address = #{address,jdbcType=VARCHAR},
+	      phone_number = #{phoneNumber,jdbcType=VARCHAR},
+	      urgency = #{urgency,jdbcType=VARCHAR},
+	      patient_card_type = #{patientCardType,jdbcType=VARCHAR},
+	      patient_card_number = #{patientCardNumber,jdbcType=VARCHAR},
+	      impression = #{impression,jdbcType=VARCHAR},
+	      summary = #{summary,jdbcType=VARCHAR},
+	      history = #{history,jdbcType=VARCHAR},
+	      treatment_situation = #{treatmentSituation,jdbcType=VARCHAR},
+	      refferral_purpose = #{refferralPurpose,jdbcType=VARCHAR},
+	      referral_reason = #{referralReason,jdbcType=VARCHAR},
+	      main_inspection_results = #{mainInspectionResults,jdbcType=VARCHAR},
+	      pool_flag = #{poolFlag,jdbcType=VARCHAR},
+	      file_code = #{fileCode,jdbcType=VARCHAR},
+	      patients_identification_number = #{patientsIdentificationNumber,jdbcType=VARCHAR},
+	      hospitalization_patients_identification_number = #{hospitalizationPatientsIdentificationNumber,jdbcType=VARCHAR},
+	      rehabilitation_suggestion = #{rehabilitationSuggestion,jdbcType=VARCHAR},
+	      apply_date = #{applyDate,jdbcType=DATE},
+	      apply_hospital_code = #{applyHospitalCode,jdbcType=VARCHAR},
+	      apply_hospital_name = #{applyHospitalName,jdbcType=VARCHAR},
+	      item_hospital_code = #{itemHospitalCode,jdbcType=VARCHAR},
+	      item_hospital_name = #{itemHospitalName,jdbcType=VARCHAR},
+	      long_term_testament = #{longTermTestament,jdbcType=VARCHAR},
+	      imaging_report = #{imagingReport,jdbcType=VARCHAR},
+	      inspection_and_test = #{inspectionAndTest,jdbcType=VARCHAR},
+	      admission_record = #{admissionRecord,jdbcType=VARCHAR},
+	      course_record = #{courseRecord,jdbcType=VARCHAR},
+	      operation_record = #{operationRecord,jdbcType=VARCHAR},
+	      stat_order = #{statOrder,jdbcType=VARCHAR},
+	      others = #{others,jdbcType=VARCHAR},
+	      filling_flag = #{fillingFlag,jdbcType=VARCHAR},
+	      filling_reason = #{fillingReason,jdbcType=VARCHAR},
+	      real_referral_date = #{realReferralDate,jdbcType=DATE},
+	      apply_doctor_id_card = #{applyDoctorIdCard,jdbcType=VARCHAR},
+          apply_doctor_name = #{applyDoctorName,jdbcType=VARCHAR}
+<!-- 	      status = #{status,jdbcType=VARCHAR}, -->
+<!-- 	      create_time = #{createTime,jdbcType=TIMESTAMP}, -->
+<!-- 	      creator = #{creator,jdbcType=VARCHAR} -->
+	    where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+	<!-- 获取住院转诊信息 -->
+	<select id="getReferralHospitalizationInfo" parameterType="integer" resultType="com.boco.modules.fdoc.model.ReferralHospitalizationEntity">
+		select <include refid="Base_Column_List"/> from t_referral_hospitalization
+		where id = #{0}
+	</select>
+	
+	<!-- 通过referralCode获取住院转诊信息 -->
+	<select id="getReferralHospitalizationInfoByCode" parameterType="string" resultType="com.boco.modules.fdoc.model.ReferralHospitalizationEntity">
+		select <include refid="Base_Column_List"/> from t_referral_hospitalization
+		where referral_code = #{0}
+	</select>
+	
+	<!-- 修改住院转诊流程状态 -->
+	<update id="updateReferralHospitalizationStatus" parameterType="com.boco.modules.fdoc.model.ReferralHospitalizationEntity">
+		update t_referral_hospitalization set `status` = #{status}
+		where referral_code = #{referralCode}
+	</update>
+	
+	<!-- 获取签约居民的住院转诊申请记录列表 -->
+	<select id="getReferralHospitalizationListBySign" parameterType="com.boco.modules.fdoc.vo.ReferralHospitalizationVo" resultType="com.boco.modules.fdoc.vo.ReferralHospitalizationVo">
+		select a.id, a.person_name, a.sex, a.age, a.phone_number, a.item_hospital_name, a.id_card, a.`status`, a.referral_code, a.filling_flag, a.create_time
+		from t_referral_hospitalization a left join t_user_doc_sign b on a.person_id = b.person_id
+		where b.doc_team_id = #{docTeamId}
+		<if test="personName != null and personName != ''">
+			and a.person_name like CONCAT('%',#{personName},'%')
+		</if>
+		<if test="idCard != null and idCard != ''">
+			and a.id_card = #{idCard}
+		</if>
+		order by a.create_time DESC
+	</select>
+	
+	<!-- 获取签约居民的住院转诊申请记录数量 -->
+	<select id="getReferralHospitalizationCountBySign" parameterType="com.boco.modules.fdoc.vo.ReferralHospitalizationVo" resultType="integer">
+		select count(a.id)
+		from t_referral_hospitalization a left join t_user_doc_sign b on a.person_id = b.person_id
+		where b.doc_team_id = #{docTeamId}
+		<if test="personName != null and personName != ''">
+			and a.person_name like CONCAT('%',#{personName},'%')
+		</if>
+		<if test="idCard != null and idCard != ''">
+			and a.id_card = #{idCard}
+		</if>
+	</select>
+</mapper>

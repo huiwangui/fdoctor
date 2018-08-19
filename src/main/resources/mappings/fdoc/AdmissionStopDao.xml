@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.AdmissionStopDao">
+	
+	<sql id="stopColumns">
+		id,
+		his_id,
+		sche_id,
+		status,
+		start_date,
+		end_date,
+		flag,
+		reason,
+		create_time,
+		update_time
+	</sql>
+	
+	<select id="getStopList" resultType="AdmissionStopEntity">
+		SELECT 
+		<include refid="stopColumns"/> 
+		FROM t_admission_stop 
+		WHERE start_date >= CURRENT_TIME
+	</select>
+	
+	<select id="getStopDetail" parameterType="int" resultType="AdmissionStopEntity">
+		SELECT 
+		<include refid="stopColumns"/>
+		FROM t_admission_stop 
+		WHERE id=#{id}
+	</select>
+</mapper>

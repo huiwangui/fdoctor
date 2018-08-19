@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.boco.modules.fdoc.dao.expert.ExpertDao" >
+   <sql id="Base_Column_List">
+    id, expert_name, sex, title, introduction, specialty, img, phone_number, org_id, 
+    department, personal_style,create_time,update_time, id_card, qualification_number, 
+    practising_certificate_number
+  </sql>
+  <!-- 根据id查询基本信息 -->
+  <select id="getExpertInfoByExpertId" parameterType="java.lang.String" resultType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+  		SELECT
+			a.id,
+			a.expert_name,
+			a.department,
+			a.img,
+			a.introduction,
+			a.org_id,
+			a.phone_number,
+			a.sex,
+			a.specialty,
+			a.title,
+			a.personal_style,
+			b.org_name
+		FROM
+			t_expert_information a,
+			t_hospital b
+		WHERE
+			a.org_id = b.id
+		AND a.id =#{0}
+  </select>
+   
+   <!-- 获取已签约列表 -->
+	<select id="getSignedList" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+		    b.person_id,
+			b.person_name,
+			b.sex,
+			b.current_address,
+			c.img,
+			DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(b.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		FROM
+			t_expert_user_sign a,
+			t_person_information b,
+			t_user c
+		WHERE
+			a.expert_id = #{id,jdbcType=VARCHAR}
+		AND a.person_id = b.person_id
+		and c.person_id = b.person_id
+		<if test="personName != null and personName != ''">
+				AND b.person_name LIKE CONCAT('%',#{personName},'%')
+		</if>
+   </select>
+  
+   <!-- 获取已签约总数 -->
+   <select id="getSignedCount" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo" resultType="int">
+		SELECT
+			count(b.person_name)			 
+		FROM
+			t_expert_user_sign a,
+			t_person_information b
+		WHERE
+			a.expert_id = #{id,jdbcType=VARCHAR}
+		AND a.person_id = b.person_id
+		<if test="personName != null and personName != ''">
+			AND b.person_name LIKE CONCAT('%',#{personName},'%')
+		</if>
+   </select>
+   
+    <!-- 获取个人慢病 -->
+   <select id="getLabelListByPersonId" parameterType="string" resultType="string">
+		SELECT
+			b.label_name
+		FROM
+			t_disease_label_person_relation a,
+			t_disease_label b
+		WHERE
+			a.label_id = b.id
+		AND a.person_id = #{0} 
+   </select>
+  
+  <insert id="insertSelective" parameterType="com.boco.modules.fdoc.model.expert.ExpertInformationEntity" >
+    insert into t_expert_information
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="expertName != null" >
+        expert_name,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="introduction != null" >
+        introduction,
+      </if>
+      <if test="specialty != null" >
+        specialty,
+      </if>
+      <if test="img != null" >
+        img,
+      </if>
+      <if test="phoneNumber != null" >
+        phone_number,
+      </if>
+      <if test="orgId != null" >
+        org_id,
+      </if>
+      <if test="department != null" >
+        department,
+      </if>
+       <if test="personalStyle != null" >
+        personal_style,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="expertName != null" >
+        #{expertName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="introduction != null" >
+        #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="specialty != null" >
+        #{specialty,jdbcType=VARCHAR},
+      </if>
+      <if test="img != null" >
+        #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNumber != null" >
+        #{phoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="department != null" >
+        #{department,jdbcType=VARCHAR},
+      </if>
+      <if test="personalStyle != null" >
+        #{personalStyle,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="update" parameterType="com.boco.modules.fdoc.model.expert.ExpertInformationEntity" >
+    update t_expert_information
+    <set >
+      <if test="expertName != null" >
+        expert_name = #{expertName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="introduction != null" >
+        introduction = #{introduction,jdbcType=VARCHAR},
+      </if>
+      <if test="specialty != null" >
+        specialty = #{specialty,jdbcType=VARCHAR},
+      </if>
+      <if test="img != null" >
+        img = #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="phoneNumber != null" >
+        phone_number = #{phoneNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        org_id = #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="department != null" >
+        department = #{department,jdbcType=VARCHAR},
+      </if>
+       <if test="personalStyle != null" >
+        personal_style = #{personalStyle,jdbcType=VARCHAR},
+      </if>
+       <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <!-- 获取专家总数  居民端-->
+   <select id="getSignedExpertCountOfPersonId" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo" resultType="int">
+		SELECT
+			count(expert_name)			 
+		FROM
+			t_expert_information 
+		<where>
+			<if test="expertName != null and expertName != ''">
+			   expert_name LIKE CONCAT('%',#{expertName},'%')
+			</if>
+		</where>
+		
+   </select>
+   <!-- 获取专家列表  居民端-->
+   <select id="getSignedExpertListOfPersonId" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo" resultType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+		SELECT
+			b.id,
+			b.expert_name,
+			b.department,
+			b.img,
+			b.sex,
+			b.title,
+			c.org_name
+		FROM
+			t_expert_information b,
+			t_hospital c
+		WHERE
+	  		 b.org_id = c.id
+			<if test="expertName != null and expertName != ''">
+			AND b.expert_name LIKE CONCAT('%',#{expertName},'%')
+			</if>
+			order by b.org_id desc
+   </select>
+   <!-- 新增对应关系 -->
+	<insert id="addExpertAndResidentRelationship" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+		insert into t_expert_user_sign (expert_id, person_id,create_time)
+	      values (#{id,jdbcType=INTEGER}, #{personId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP})
+	</insert>
+	<!-- 删除对应关系 -->
+	<delete id="cancelExpertAndResidentRelationship" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+		delete from t_expert_user_sign where expert_id = #{id} and person_id =#{personId}
+	</delete>
+	<!-- 获取是否关注  居民端-->
+   <select id="getRelationship" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo" resultType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+		 select 
+		 	expert_id as id
+		 from t_expert_user_sign 
+		 where  person_id =#{personId}
+		 <if test="id != null and id != ''">
+			AND  expert_id =#{id,jdbcType=VARCHAR}  
+		 </if>
+   </select>
+   <!-- 获取专家基本信息  居民端-->
+   <select id="getExpertInfoOfPersonId" parameterType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo" resultType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+		 SELECT
+			a.department,
+			a.introduction,
+			a.img,
+			a.id,
+			a.sex,
+			a.org_id,
+			c.org_name,
+		    a.phone_number,
+		    a.expert_name,
+		    d.user_name
+		FROM
+			t_expert_information a,
+			t_expert_user_sign b,
+			t_hospital c,
+			t_expert_account d
+		WHERE
+			a.id = b.expert_id
+		AND a.org_id = c.id
+		and a.id = d.expert_id
+		AND b.person_id =#{personId}
+		  
+   </select>
+   
+   <!-- 根据解约请求id查询专家信息 -->
+    <select id="getExpertInfoBySurrenderId" parameterType="int" resultType="com.boco.modules.fdoc.vo.expert.ExpertInformationVo">
+	SELECT
+	  c.expert_name,
+	  c.sex,
+	  c.introduction,
+	  c.title,
+	  c.img
+	FROM
+		t_surrender_request a,
+		t_surrender_information b,
+		t_expert_information c
+	WHERE
+		a.id = b.request_id
+	AND b.expert_id = c.id
+	and a.id=#{id}
+		  
+   </select>
+   
+</mapper>

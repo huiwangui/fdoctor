@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.SignRequestDao">
+	<sql id="Base_Column_List">
+		id, doc_team_id, doc_org_name, person_id, sign_img, status, create_time,due_time,service_pack_value
+	</sql>
+
+	<!-- 新增签约申请 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.SignRequestEntity"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into t_sign_request (id, doc_team_id, doc_org_name,
+		person_id, sign_img, status,
+		create_time,due_time,service_pack_value)
+		values (#{id,jdbcType=INTEGER}, #{docTeamId,jdbcType=VARCHAR},
+		#{docOrgName,jdbcType=VARCHAR},
+		#{personId,jdbcType=VARCHAR}, #{signImg,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+		#{createTime,jdbcType=TIMESTAMP},#{dueTime},#{servicePackValue})
+	</insert>
+
+	<!-- 根据ID单表查询 -->
+	<select id="get" parameterType="string"
+		resultType="com.boco.modules.fdoc.model.SignRequestEntity">
+		select
+		<include refid="Base_Column_List" />
+		from t_sign_request where id = #{0}
+	</select>
+
+	<!-- 根据家庭、团队和状态获取对象 -->
+	<select id="getByPersonAndTeam" parameterType="com.boco.modules.fdoc.model.SignRequestEntity"
+		resultType="com.boco.modules.fdoc.model.SignRequestEntity">
+		select
+		<include refid="Base_Column_List" />
+		from t_sign_request
+		where doc_team_id = #{docTeamId} and person_id =
+		#{personId} and status = #{status}
+	</select>
+
+	<!-- 获取签约申请列表 -->
+	<select id="getRequestList" parameterType="com.boco.modules.fdoc.vo.SignRequestVo"
+		resultType="com.boco.modules.fdoc.vo.SignRequestVo">
+		SELECT
+			a.id,
+			a.doc_team_id,
+			a.doc_org_name,
+			a.sign_img,
+			a.`status`,
+			a.create_time,
+			a.person_id,
+			c.doc_name,
+			d.person_name,
+			d.unit personUnit,
+			a.due_time,
+			a.service_pack_value
+		FROM
+			t_sign_request a
+		LEFT JOIN (
+			SELECT
+				team_id,
+				doc_name
+			FROM
+				t_doctor
+			WHERE
+				leader_flag = 1
+		) c ON a.doc_team_id = c.team_id
+		LEFT JOIN t_person_information d ON a.person_id = d.person_id
+		<where>
+			<if test="docTeamId != null and docTeamId != ''">
+				a.doc_team_id = #{docTeamId}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="personId != null and personId != ''">
+				AND a.person_id = #{personId}
+			</if>
+		</where>
+		ORDER BY
+		a.create_time DESC
+	</select>
+
+	<!-- 获取签约申请数量 -->
+	<select id="getRequestCount" parameterType="com.boco.modules.fdoc.vo.SignRequestVo"
+		resultType="integer">
+		SELECT
+		count(id)
+		FROM
+		t_sign_request
+		WHERE
+		doc_team_id = #{docTeamId}
+		AND status = #{status}
+	</select>
+
+	<!-- 获取签约申请详情 -->
+	<select id="getRequestDetail" parameterType="integer"
+		resultType="com.boco.modules.fdoc.vo.SignRequestVo">
+		SELECT
+			a.id,
+			a.doc_team_id,
+			a.doc_org_name,
+			a.sign_img,
+			a.`status`,
+			a.create_time,
+			a.person_id,
+			c.doc_name,
+			c.org_name,
+			d.person_name,
+			d.unit personUnit,
+			d.qq,
+			d.wechat,
+			d.phone_number,
+			a.due_time,
+			a.service_pack_value
+		FROM
+			t_sign_request a
+		LEFT JOIN (
+			SELECT
+				a.doc_name,
+				a.org_id,
+				a.team_id,
+				b.org_name
+			FROM
+				t_doctor a
+			LEFT JOIN t_hospital b ON a.org_id = b.id
+			WHERE
+				a.leader_flag = 1
+		) c ON a.doc_team_id = c.team_id
+		LEFT JOIN t_person_information d ON a.person_id = d.person_id
+		WHERE
+			id = #{0}
+	</select>
+
+	<!-- 修改请求 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.SignRequestEntity">
+		update t_sign_request
+		<set>
+			<if test="docTeamId != null">
+				doc_team_id = #{docTeamId,jdbcType=VARCHAR},
+			</if>
+			<if test="docOrgName != null">
+				doc_org_name = #{docOrgName,jdbcType=VARCHAR},
+			</if>
+			<if test="personId != null">
+				person_id = #{personId,jdbcType=VARCHAR},
+			</if>
+			<if test="signImg != null">
+				sign_img = #{signImg,jdbcType=VARCHAR},
+			</if>
+			<if test="status != null">
+				status = #{status,jdbcType=VARCHAR},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="dueTime != null">
+				due_time = #{dueTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="servicePackValue != null">
+				service_pack_value = #{servicePackValue}
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+	
+</mapper>

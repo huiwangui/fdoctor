@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.PatientOrderDao">
+	<!-- 预约门诊 -->
+	<insert id="save" parameterType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity">
+		insert into t_biz_outpatient_order (order_number,patient_id, order_status, create_time, creator_uid,outpatient_source_id,order_time,clinic_time)
+	    values (#{orderNumber,jdbcType=VARCHAR},#{patientId,jdbcType=VARCHAR},  
+	      #{orderStatus,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP}, 
+	      #{creatorUid,jdbcType=VARCHAR},#{outpatientSourceId,jdbcType=INTEGER},#{orderTime,jdbcType=DATE},#{clinicTime,jdbcType=VARCHAR}
+	      )
+	</insert>
+	<!-- 预约体检 -->
+	<insert id="savePhysicalOrder" parameterType="com.boco.modules.fdoc.model.PhysicalExaminationOrderEntity">
+		insert into t_physical_examination_order (order_number,patient_id, order_status, create_time, creator_uid,order_time,clinic_time,tj_name)
+	    values (#{orderNumber,jdbcType=VARCHAR},#{patientId,jdbcType=VARCHAR},  
+	      #{orderStatus,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP}, 
+	      #{creatorUid,jdbcType=VARCHAR},#{orderTime,jdbcType=DATE},#{clinicTime,jdbcType=VARCHAR},#{tjName,jdbcType=VARCHAR}
+	      )
+	</insert>
+	<!-- 预约随访 -->
+	<insert id="saveFollowUpOrder" parameterType="com.boco.modules.fdoc.model.FollowUpOrderEntity">
+		insert into t_follow_up_order (order_number,patient_id, order_status, create_time, creator_uid,order_time,clinic_time,fp_name)
+	    values (#{orderNumber,jdbcType=VARCHAR},#{patientId,jdbcType=VARCHAR},  
+	      #{orderStatus,jdbcType=VARCHAR},#{createTime,jdbcType=TIMESTAMP}, 
+	      #{creatorUid,jdbcType=VARCHAR},#{orderTime,jdbcType=DATE},#{clinicTime,jdbcType=VARCHAR},#{fpName,jdbcType=VARCHAR}
+	      )
+	</insert>
+	 <!-- 修改订单状态 -->
+	<update id="updateOrderStatus" parameterType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity">
+		update t_biz_outpatient_order set order_status =#{orderStatus,jdbcType=VARCHAR}, cancle_time=#{cancleTime,jdbcType=TIMESTAMP} where order_number=#{orderNumber,jdbcType=VARCHAR}
+	</update>
+	<select id="getOrderByNumber" parameterType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity" resultType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity">
+	SELECT
+	patient_id,outpatient_source_id
+	FROM
+		t_biz_outpatient_order
+	WHERE
+		order_number = #{orderNumber,jdbcType=VARCHAR}
+	</select>
+	<!-- 查询免疫是否预约 -->
+	<select id="getOrderByuid" parameterType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity" resultType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity">
+	SELECT
+	order_time,order_number,clinic_time
+	FROM
+		t_biz_outpatient_order
+	WHERE
+		creator_uid = #{creatorUid,jdbcType=VARCHAR}
+	AND order_status = #{orderStatus,jdbcType=VARCHAR}
+	</select>
+	<!-- 修改免疫订单状态 已完成 -->
+	<update id="updateImmuneOrderStatusOfFinish" parameterType="com.boco.modules.fdoc.model.BizOutpatientOrderEntity">
+		UPDATE t_biz_outpatient_order
+		SET order_status = #{orderStatus,jdbcType=VARCHAR}
+		WHERE
+			order_number = #{orderNumber,jdbcType=VARCHAR}
+	</update> 
+	<!-- 修改体检订单状态 -->
+	<update id="updatePhysicalOrderStatus" parameterType="com.boco.modules.fdoc.model.PhysicalExaminationOrderEntity">
+		update t_physical_examination_order set order_status =#{orderStatus,jdbcType=VARCHAR}, cancle_time=#{cancleTime,jdbcType=TIMESTAMP} where order_number=#{orderNumber,jdbcType=VARCHAR}
+	</update> 
+	<!-- 修改随访订单状态 -->
+	<update id="updateFollowUpOrderStatus" parameterType="com.boco.modules.fdoc.model.FollowUpOrderEntity">
+		update t_follow_up_order set order_status =#{orderStatus,jdbcType=VARCHAR}, cancle_time=#{cancleTime,jdbcType=TIMESTAMP} where order_number=#{orderNumber,jdbcType=VARCHAR}
+	</update> 
+	<!-- 判断体检是否预约 -->
+	<select id="getPhysicalOrderByuid" parameterType="com.boco.modules.fdoc.model.PhysicalExaminationOrderEntity" resultType="com.boco.modules.fdoc.model.PhysicalExaminationOrderEntity">
+	SELECT
+	order_time,order_number,clinic_time
+	FROM
+		t_physical_examination_order
+	WHERE
+		creator_uid = #{creatorUid,jdbcType=VARCHAR}
+	AND order_status = #{orderStatus,jdbcType=VARCHAR}
+	</select>
+	<!-- 修改体检订单状态 已完成 -->
+	<update id="updatePhysicalOrderStatusOfFinish" parameterType="com.boco.modules.fdoc.model.PhysicalExaminationOrderEntity">
+		UPDATE t_physical_examination_order
+		SET order_status = #{orderStatus,jdbcType=VARCHAR}
+		WHERE
+			order_number = #{orderNumber,jdbcType=VARCHAR}
+	</update> 
+	<!-- 判断随访是否预约 -->
+	<select id="getFollowUpOrderByuid" parameterType="com.boco.modules.fdoc.model.FollowUpOrderEntity" resultType="com.boco.modules.fdoc.model.FollowUpOrderEntity">
+	SELECT
+	order_time,order_number,clinic_time
+	FROM
+		t_follow_up_order
+	WHERE
+		creator_uid = #{creatorUid,jdbcType=VARCHAR}
+	AND order_status = #{orderStatus,jdbcType=VARCHAR}
+	</select>
+	<!-- 修改随访订单状态 已完成 -->
+	<update id="updateFollowUpOrderStatusOfFinish" parameterType="com.boco.modules.fdoc.model.FollowUpOrderEntity">
+		UPDATE t_follow_up_order
+		SET order_status = #{orderStatus,jdbcType=VARCHAR}
+		WHERE
+			order_number = #{orderNumber,jdbcType=VARCHAR}
+	</update> 
+</mapper>

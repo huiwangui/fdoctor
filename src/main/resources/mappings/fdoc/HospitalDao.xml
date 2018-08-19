@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.HospitalDao">
+	<!-- 查询机构列表，包含团队个数 -->
+	<select id="getHospitalListWithTeamNum" parameterType="com.boco.modules.fdoc.vo.HospitalVo" resultType="com.boco.modules.fdoc.vo.HospitalVo">
+		SELECT
+			a.org_name,a.address,
+			a.id,a.region_code,
+			b.ct teamNum
+		FROM
+			t_hospital a
+		LEFT JOIN (
+			SELECT
+				a.org_id,
+				count(a.team_id) ct
+			FROM
+				(
+					SELECT
+						org_id,
+						team_id
+					FROM
+						t_doctor
+					GROUP BY
+						team_id
+				) a
+			GROUP BY
+				a.org_id
+		) b ON a.id = b.org_id
+		<where>
+<!-- 			<if test="regions != null and regions != ''"> -->
+<!-- 				a.region_code IN (${regions}) -->
+<!-- 			</if> -->
+			<if test="orgName != null and orgName != ''">
+				a.org_name LIKE CONCAT("%", #{orgName}, "%")
+			</if>
+		</where>
+	</select>
+	
+	<!-- 获取机构下的医生团队列表 -->
+	<select id="getTeamInHospital" parameterType="string" resultType="com.boco.modules.fdoc.vo.HospitalVo">
+		SELECT
+			a.team_id docTeamId,a.org_id,a.doc_name,b.ct docNum,c.org_name
+		FROM
+			t_doctor a 
+		left join (select team_id,count(id) ct from t_doctor group by team_id) b on a.team_id= b.team_id
+		left join t_hospital c on a.org_id = c.id
+		WHERE
+			a.org_id = #{0} and a.leader_flag=1
+	</select>
+	<!-- 根据居民uid查询签约医院信息 -->
+	<select id="getHospitalByUid" parameterType="string" resultType="com.boco.modules.fdoc.model.HospitalEntity">
+		SELECT
+			c.doc_org_name org_name,c.doc_org_name address
+		FROM
+			t_user a,
+			t_person_information b,
+			t_user_doc_sign c
+		WHERE
+			a.person_id = b.person_id
+		AND b.person_id = c.person_id
+		AND a.uid =#{0}
+	</select>
+	
+	<!-- 获取医院信息 -->
+	<select id="getHospitalInfo" parameterType="string" resultType="com.boco.modules.fdoc.model.HospitalEntity">
+		select id,org_name,region_code,address from t_hospital
+		where id = #{0}
+	</select>
+
+	<!-- 获取所有医院的 -->
+	<select id="getAll"   resultType="com.boco.modules.fdoc.model.HospitalEntity">
+		select DISTINCT region_code  from t_hospital
+	</select>
+</mapper>

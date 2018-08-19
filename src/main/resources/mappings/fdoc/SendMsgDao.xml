@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.SendMsgDao">
+
+	<sql id="Base_Column_List">
+	   id, title, content, uid, doc_user_name, create_time, receiver_type, push_info_type, 
+	   data
+	</sql>
+
+	<!-- 新增推送消息 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.SendMsgEntity">
+	   insert into t_send_msg (title, content, 
+	     uid, doc_user_name, create_time, 
+	     receiver_type, push_info_type, data
+	     )
+	   values (#{title,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, 
+	     #{uid,jdbcType=VARCHAR}, #{docUserName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+	     #{receiverType,jdbcType=INTEGER}, #{pushInfoType,jdbcType=INTEGER}, #{data,jdbcType=VARCHAR}
+	     )
+	</insert>
+	
+	<!-- 获取消息列表 -->
+	<select id="getMsgList" parameterType="com.boco.modules.fdoc.model.SendMsgEntity" resultType="com.boco.modules.fdoc.model.SendMsgEntity">
+		select <include refid="Base_Column_List"/> from t_send_msg
+		<where>
+			<if test="uid != null and uid != ''">
+				uid = #{uid}
+			</if>
+			<if test="docUserName != null and docUserName != ''">
+				AND doc_user_name = #{docUserName}
+			</if>
+			order by create_time DESC
+		</where>
+	</select>
+	
+	<!-- 获取消息总数 -->
+	<select id="getMsgCount" parameterType="com.boco.modules.fdoc.model.SendMsgEntity" resultType="integer">
+		select count(id) from t_send_msg
+		<where>
+			<if test="uid != null and uid != ''">
+				uid = #{uid}
+			</if>
+			<if test="docUserName != null and docUserName != ''">
+				AND doc_user_name = #{docUserName}
+			</if>
+		</where>
+	</select>
+</mapper>

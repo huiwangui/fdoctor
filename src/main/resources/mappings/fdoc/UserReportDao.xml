@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.UserReportDao">
+     <!-- 查询出居民所有上传图片记录 居民端 -->
+     <select id="getAllUserReportByUid" parameterType="com.boco.modules.fdoc.vo.UserReportVo" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	     SELECT
+			a.upload_time,
+			a.img_time,
+			a.img,
+			a.report_description,
+			a.`status`,
+			a.doctor_id,
+			a.person_id
+		FROM
+			t_person_image a,
+			t_user b
+		WHERE
+			a.person_id = b.person_id
+		AND b.person_id = #{personId}
+		ORDER BY
+	    a.upload_time DESC
+     </select>
+     <!-- 查询总数  居民端-->
+     <select id="getCountByUid" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	     SELECT
+			a.upload_time,
+			a.img_time,
+			a.img,
+			a.report_description,
+			a.`status`,
+			a.doctor_id,
+			a.person_id
+		FROM
+			t_person_image a,
+			t_user b
+		WHERE
+			a.person_id = b.person_id
+		AND b.person_id = #{personId}
+		</select>
+		<!-- 查询总数 医生端 -->
+		<select id="getCountByPersonId" parameterType="com.boco.modules.fdoc.vo.UserParamVo" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+		 SELECT
+			a.upload_time,
+			a.img_time,
+			a.img,
+			a.report_description,
+			a.`status`,
+			a.doctor_id,
+			a.person_id
+		FROM
+			t_person_image a,
+			t_doctor_user b,
+			t_doctor c
+		WHERE
+			a.doc_team_id = c.team_id
+		AND b.doctor_id = c.id
+		AND a.person_id = #{personId}
+		AND b.user_name = #{userName}
+		 
+     </select>
+     <!-- 查询出居民最近上传图片记录 居民端 -->
+     <select id="getSingleUserReportByUid" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	     SELECT
+			a.upload_time,
+			a.img_time,
+			a.img,
+			a.report_description,
+			a.`status`,
+			a.doctor_id,
+			a.person_id
+		FROM
+			t_person_image a,
+			t_user b
+		WHERE
+			a.person_id = b.person_id
+		AND b.person_id = #{personId}
+		ORDER BY
+		a.upload_time DESC
+		LIMIT 1
+     </select>
+     <!-- 查询出居民所有上传图片记录 医生端 -->
+     <select id="getAllUserReportByPersonId" parameterType="com.boco.modules.fdoc.vo.UserReportParamVo" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+		SELECT
+			a.upload_time,
+			a.img_time,
+			a.img,
+			a.report_description,
+			a.`status`,
+			a.doctor_id,
+			a.person_id
+		FROM
+			t_person_image a,
+			t_doctor_user b,
+			t_doctor c
+		WHERE
+			a.doc_team_id = c.team_id
+		AND b.doctor_id = c.id
+		AND a.person_id = #{personId}
+		AND b.user_name = #{userName}
+		ORDER BY
+			a.upload_time DESC
+     </select>
+     <!-- 查询出最近上传图片记录 医生端 -->
+     <select id="getSingleUserReportByPersonId" parameterType="com.boco.modules.fdoc.vo.UserReportParamVo" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+		SELECT
+			a.upload_time,
+			a.img_time,
+			a.img,
+			a.report_description,
+			a.`status`,
+			a.doctor_id,
+			a.person_id
+		FROM
+			t_person_image a
+			 
+		WHERE
+        a.person_id = #{personId}
+		 
+		order by a.upload_time desc
+		limit 1
+     </select>
+	 <!-- 修改用户报告信息 -->
+	 <update id="updateUserReport" parameterType="com.boco.modules.fdoc.model.UserReportEntity" >
+	  update t_person_image
+	  <set >   
+	    
+	     <if test="doctorId != null" >
+	      doctor_id = #{doctorId,jdbcType=VARCHAR},
+	    </if>
+	    <if test="img != null" >
+	      img = #{img,jdbcType=VARCHAR},
+	    </if>
+	    <if test="reportDescription != null" >
+	      report_description = #{reportDescription,jdbcType=VARCHAR},
+	    </if>
+	    <if test="uploadTime != null" >
+	      upload_time = #{uploadTime,jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="imgTime != null" >
+	      img_time = #{imgTime,jdbcType=DATE},
+	    </if>
+	  </set>
+	  where person_id = #{personId,jdbcType=VARCHAR}
+	</update>
+	<!-- 添加居民报告记录 -->
+	<insert id="insertUserReport" parameterType="com.boco.modules.fdoc.model.UserReportEntity">
+	insert into t_person_image(uid,upload_time,report_description,img_time,img,person_id) values(#{uid,jdbcType=VARCHAR},#{uploadTime,jdbcType=TIMESTAMP},
+	                          #{reportDescription,jdbcType=VARCHAR},#{imgTime,jdbcType=DATE},#{img,jdbcType=VARCHAR}, #{personId,jdbcType=VARCHAR})
+	</insert>
+	<!-- 根据居民id查询出与他签约医生 的docid 居民端-->
+	<select id="getdoctorIdByUid" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	SELECT
+	c.team_id doc_team_id,b.person_id
+	FROM
+		t_user a,
+		t_person_information b,
+		t_doctor c,
+		t_user_doc_sign d
+	WHERE
+		a.person_id = b.person_id
+	AND b.person_id = d.person_id
+	AND d.doc_team_id = c.team_id
+	AND a.uid =#{0} AND c.leader_flag='1'
+	LIMIT 1
+	</select>  
+	<!-- 根据居民id查询出与他签约医生 的docid 居民端-->
+	<select id="getdoctorIdByPersonId" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	SELECT
+	c.team_id doc_team_id,b.person_id
+	FROM
+		t_user a,
+		t_person_information b,
+		t_doctor c,
+		t_user_doc_sign d
+	WHERE
+		a.person_id = b.person_id
+	AND b.person_id = d.person_id
+	AND d.doc_team_id = c.team_id
+	AND a.person_id =#{0} AND c.leader_flag='1'
+	LIMIT 1
+	</select>
+	<!-- 根据uid获取用户报告信息 -->
+	<select id="getUserReportByUid" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+		SELECT
+			a.upload_time,
+			a.report_description,
+			a.img_time,
+			a.img,
+			b.person_name	    
+		FROM
+			t_person_image a,
+			t_person_information b
+		WHERE
+			a.person_id = b.person_id
+		AND a.person_id = #{0}
+	</select>
+	<!-- 根据医生名字查询出医生信息 医生端 -->
+	<select id="getDoctorIdByUsername" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+		SELECT a.doctor_id,b.doc_name,b.team_id doc_team_id from t_doctor_user a,t_doctor b where a.doctor_id=b.id and a.user_name=#{0}
+	</select>
+	<!-- 添加居民报告记录  居民端-->
+	<insert id="insertUserReportByUser" parameterType="com.boco.modules.fdoc.model.UserReportEntity">
+	insert into t_person_image(doc_team_id,upload_time,report_description,img_time,img,person_id,status) values(#{docTeamId,jdbcType=VARCHAR},#{uploadTime,jdbcType=TIMESTAMP},
+	                          #{reportDescription,jdbcType=VARCHAR},#{imgTime,jdbcType=DATE},#{img,jdbcType=VARCHAR},#{personId,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR})
+	</insert>
+	<!-- 添加居民报告记录  医生端-->
+	<insert id="insertUserReportByDoc" parameterType="com.boco.modules.fdoc.model.UserReportEntity">
+	insert into t_person_image(doc_team_id,doctor_id,upload_time,report_description,img_time,img,person_id,status) values(#{docTeamId,jdbcType=VARCHAR},#{doctorId,jdbcType=VARCHAR},#{uploadTime,jdbcType=TIMESTAMP},
+	                          #{reportDescription,jdbcType=VARCHAR},#{imgTime,jdbcType=DATE},#{img,jdbcType=VARCHAR},#{personId,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR})
+	</insert>
+	<!-- 根据居民id查询出显示信息 医生端 -->
+	<select id="getInformationByUid" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	   select a.upload_time,a.img_time,a.img,a.report_description,b.doc_name from t_person_image a,t_doctor b where a.doctor_id=b.id and a.person_id=#{0}
+	</select>
+	<!-- 根据居民id查询此人上传图片的记录  医生端 -->
+	<select id="getPersonImgByUid" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	   SELECT a.upload_time,a.doctor_id,a.img,a.img_time,a.person_id,a.report_description from t_person_image a where a.person_id =#{0}
+	</select>
+	<!-- 根据居民personId查询出居民名称 -->
+	<select id="getPersonNameByPersonId" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	   SELECT person_name from t_person_information where person_id=#{0}
+	</select>
+	<!-- 根据医生docId查询出医生名称 -->
+	<select id="getDoctorNameBydoctorId" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserReportVo">
+	   SELECT doc_name from t_doctor where id=#{0}
+	</select>
+</mapper>

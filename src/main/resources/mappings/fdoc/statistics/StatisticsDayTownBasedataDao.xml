@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.statistics.StatisticsDayTownBasedataDao">
+	<sql id="Base_Column_List" >
+		id, region_code, person_count, sign_count, hyper_count, diabetes_count, children_count, 
+   		major_psychosis_count, org_count, team_count, statistics_date, create_time,family_count
+	</sql>
+	
+	<!-- 获取最近一条统计信息 -->
+	<select id="getLastInfo" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTownBasedataEntity" parameterType="string">
+		select <include refid="Base_Column_List"/> from t_statistics_day_town_basedata
+		where region_code = #{0}
+		order by statistics_date desc limit 1
+	</select>
+
+	<!-- 获取最近一条统计信息 机构id -->
+	<select id="getLastInfo1" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTownBasedataEntity" parameterType="string">
+		select <include refid="Base_Column_List"/> from t_statistics_day_town_basedata
+		where org_id = #{0}
+		order by statistics_date desc limit 1
+	</select>
+	
+	<!-- 通过统计日期获取统计信息 -->
+	<select id="getLastInfoByDate" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTownBasedataEntity" parameterType="com.boco.modules.fdoc.model.statistics.StatisticsDayTownBasedataEntity">
+		select <include refid="Base_Column_List"/> from t_statistics_day_town_basedata
+		where statistics_date = #{statisticsDate} and region_code = #{regionCode}
+	</select>
+
+
+	<!-- 通过统计日期获取统计信息 机构id-->
+	<select id="getLastInfoByDate1" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTownBasedataEntity" parameterType="com.boco.modules.fdoc.model.statistics.StatisticsDayTownBasedataEntity">
+		select <include refid="Base_Column_List"/> from t_statistics_day_town_basedata
+		where statistics_date = #{statisticsDate} and org_id = #{orgId}  limit 1
+	</select>
+
+
+	
+	<!-- 手动调用存储过程 -->
+	<select id="callStatisticsProcedure">
+		call procedure_basedata_statistics_day_town()
+	</select>
+</mapper>

@@ -1,0 +1,42 @@
+.wrap{
+    background-color: #ffffff;
+}
+.g-container{
+    width: 1200px;
+    margin:0 auto;
+}
+.g-container:before{
+    content:'';
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.wrap .top-content{
+    padding: 20px 0;
+    margin-left: 800px;
+}
+.wrap .top-content label{
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 5px;
+    background-size:100% 100%;
+}
+.wrap .top-content a{
+    margin-right: 15px;
+}
+.wrap .top-content a:hover,.forgot:hover{
+    text-decoration: underline;
+    color: #00a7ff;;
+    cursor: pointer;
+}
+.top-bg{
+    background-color: #f5f5f5;
+}
+label.phone{
+    background-image: url(../images/phone.png);
+}
+label.contactUs{
+    background-image: url(../images/mail.png);
+}

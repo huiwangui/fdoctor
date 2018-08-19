@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.BloodSugerRecordDao">
+	<sql id="Base_Column_List" >
+	    id, person_id, blood_suger, detection_result, measuring_time, remarks
+	</sql>
+	
+	<!-- 新增血糖记录 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.BloodSugerRecordEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into t_blood_suger_record (person_id, blood_suger, 
+	      detection_result, measuring_time, remarks)
+	    values (#{personId,jdbcType=VARCHAR}, #{bloodSuger,jdbcType=DOUBLE}, 
+	      #{detectionResult,jdbcType=VARCHAR}, #{measuringTime,jdbcType=TIMESTAMP}, #{remarks,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 获取各检测结果总数 -->
+	<select id="getRecordCount" parameterType="com.boco.modules.fdoc.vo.BloodSugerRecordVo" resultType="integer">
+		SELECT
+			COUNT(id)
+		FROM
+			t_blood_suger_record
+		WHERE
+			person_id = #{personId}
+		<if test="results != null and results != ''">
+			AND detection_result IN (${results})
+		</if>
+	</select>
+	
+	<!-- 获取血糖记录列表 -->
+	<select id="getRecordList" parameterType="string" resultType="com.boco.modules.fdoc.model.BloodSugerRecordEntity">
+		select <include refid="Base_Column_List"/> from t_blood_suger_record where person_id = #{0}
+		order by measuring_time DESC
+	</select>
+	
+	<!-- 获取最近一条血压记录 -->
+	<select id="getLastRecord" parameterType="string" resultType="com.boco.modules.fdoc.model.BloodSugerRecordEntity">
+		select <include refid="Base_Column_List"/> from t_blood_suger_record where person_id = #{0}
+		order by measuring_time DESC limit 1
+	</select>
+	
+	<!-- 获取某一天最后的一条记录  -->
+	<select id="getLastRecordInDay" parameterType="com.boco.modules.fdoc.vo.BloodSugerRecordVo" resultType="com.boco.modules.fdoc.model.BloodSugerRecordEntity">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM
+			t_blood_suger_record
+		WHERE
+			person_id = #{personId}
+		AND 
+			measuring_time &gt;= #{StartDate}
+		AND 
+			measuring_time &lt;= #{endDate}
+		ORDER BY 
+			measuring_time DESC
+		Limit 1
+	</select>
+</mapper>

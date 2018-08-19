@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.boco.modules.fdoc.dao.surrender.SurrenderRequestDao" >
+  
+  <sql id="Base_Column_List" >
+    id, person_id, doc_team_id, originator, resident_mobile, doc_mobile, reason_value, 
+    reason_other, status, request_time, audit_time, audit_remark
+  </sql>
+  
+  <!-- 新增 -->
+  <insert id="insert" parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" >
+    insert into t_surrender_request
+    <trim prefix="(" suffix=")" suffixOverrides="," >     
+      <if test="personId != null and personId != ''" >
+        person_id,
+      </if>
+      <if test="docTeamId != null and docTeamId != ''" >
+        doc_team_id,
+      </if>
+      <if test="originator != null and originator != ''" >
+        originator,
+      </if>
+      <if test="residentMobile != null  and residentMobile != ''" >
+        resident_mobile,
+      </if>
+      <if test="docMobile != null and docMobile != ''" >
+        doc_mobile,
+      </if>
+      <if test="reasonValue != null" >
+        reason_value,
+      </if>
+      <if test="reasonOther != null and reasonOther != ''" >
+        reason_other,
+      </if>
+      <if test="status != null and status != ''" >
+        status,
+      </if>
+      <if test="requestTime != null" >
+        request_time,
+      </if>
+      <if test="auditTime != null" >
+        audit_time,
+      </if>
+      <if test="auditRemark != null and auditRemark != ''" >
+        audit_remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >    
+      <if test="personId != null and personId != ''" >
+        #{personId,jdbcType=VARCHAR},
+      </if>
+      <if test="docTeamId != null and docTeamId != ''" >
+        #{docTeamId,jdbcType=VARCHAR},
+      </if>
+      <if test="originator != null and originator != ''" >
+        #{originator,jdbcType=VARCHAR},
+      </if>
+      <if test="residentMobile != null and residentMobile != ''" >
+        #{residentMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="docMobile != null and docMobile != ''" >
+        #{docMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="reasonValue != null" >
+        #{reasonValue,jdbcType=INTEGER},
+      </if>
+      <if test="reasonOther != null and reasonOther != ''" >
+        #{reasonOther,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="requestTime != null" >
+        #{requestTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditTime != null" >
+        #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditRemark != null and auditRemark != ''" >
+        #{auditRemark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  <!--根据主键修改  -->
+  <update id="updateSurrenderRequestById " parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" >
+    update t_surrender_request
+    <set >
+      <if test="personId != null and personId != ''" >
+        person_id = #{personId,jdbcType=VARCHAR},
+      </if>
+      <if test="docTeamId != null and docTeamId != ''" >
+        doc_team_id = #{docTeamId,jdbcType=VARCHAR},
+      </if>
+      <if test="originator != null and originator != ''" >
+        originator = #{originator,jdbcType=VARCHAR},
+      </if>
+      <if test="residentMobile != null and residentMobile != ''" >
+        resident_mobile = #{residentMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="docMobile != null and docMobile != ''" >
+        doc_mobile = #{docMobile,jdbcType=VARCHAR},
+      </if>
+      <if test="reasonValue != null" >
+        reason_value = #{reasonValue,jdbcType=INTEGER},
+      </if>
+      <if test="reasonOther != null and reasonOther != ''" >
+        reason_other = #{reasonOther,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null and status != ''" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="requestTime != null" >
+        request_time = #{requestTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditTime != null" >
+        audit_time = #{auditTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditRemark != null and auditRemark != ''" >
+        audit_remark = #{auditRemark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+   <!-- 根据personId查询是否有解约申请 -->
+   <select id="getSurrenderRequestByPersonId" resultType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_surrender_request
+    where person_id = #{personId}
+    and `status`='1'
+  </select>
+  
+   <!-- 根据personId查询 解约详情 -->
+   <select id="getSurrenderDetailByPersonId" resultType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_surrender_request
+    where person_id = #{personId}
+    and `status`=#{status}
+    ORDER BY audit_time DESC
+    LIMIT 1
+  </select>
+  
+  <!--根据personId查询 解约详情及服务包权值  -->
+   <select id="getSurrenderDetailAndServicePackValueByPersonId" resultType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" >
+    select a.*,b.service_pack_value
+    from t_surrender_request a,t_surrender_information b
+    where a.id=b.request_id
+    AND a.person_id = #{personId}
+    and a.status=#{status}
+    ORDER BY a.audit_time DESC
+    LIMIT 1
+  </select>
+  
+  <!--根据personId查询 签约详情及服务包权值  -->
+   <select id="getSignSurrenderDetailAndServicePackValueByPersonId" resultType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" >
+    SELECT
+	a.*, b.service_pack_value
+	FROM
+		t_surrender_request a,
+		t_user_doc_sign b
+	WHERE
+		a.person_id = b.person_id
+	AND b.`status` = 1
+    AND a.person_id = #{personId}
+    and a.status=#{status}
+	ORDER BY
+		a.audit_time DESC
+	LIMIT 1
+  </select>
+  
+   <!-- 根据personId查询 审核中 、拒绝解约 、已解约记录  -->
+   <select id="getSurrenderRequestVoListByPersonId" resultType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" parameterType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_surrender_request
+    where person_id = #{personId}
+  </select>
+  
+   <!-- 根据personId查询 审核中 、拒绝解约 、已解约记录 总数 -->
+   <select id="getSurrenderRequestVoListCountByPersonId" resultType="int" parameterType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" >
+    select 
+    count(*)
+    from t_surrender_request
+    where person_id = #{personId}
+  </select>
+  <!-- 根据personId查询拒绝解约 、已解约记录  -->
+   <select id="getNoSignSurrenderRequestVoListByPersonId" resultType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" parameterType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" >
+    select 
+      a.id, a.person_id, a.doc_team_id, a.originator, a.resident_mobile, a.doc_mobile, a.reason_value, 
+      a.reason_other, a.status, a.request_time, a.audit_time, a.audit_remark
+     from t_surrender_request a 
+    where  a.person_id = #{personId}
+    and a.`status` !='1'
+ 
+  </select>
+  
+   <!-- 根据personId查询拒绝解约 、已解约记录 总数 -->
+   <select id="getNoSignSurrenderRequestVoListCountByPersonId" resultType="int" parameterType="com.boco.modules.fdoc.vo.surrender.SurrenderRequestVo" >
+    select 
+     count(*)
+    from t_surrender_request a 
+    where  a.person_id = #{personId}
+    and a.`status` !='1'
+ 
+  </select>
+  
+  <!-- 查询解约记录总数 -->
+   <select id="getSurrenderRequestCountByDocTeamId" resultType="int" parameterType="java.lang.String" >
+    select 
+      count(*)
+     from t_surrender_request  
+    where 
+     doc_team_id=#{docTeamId}
+  </select>
+  <!-- 取消解约 -->
+ <delete id="cancelSurrenderDetailByPersonId" parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity"  >
+    delete from t_surrender_request
+    where person_id = #{personId}
+    and `status`='1'
+  </delete>
+</mapper>

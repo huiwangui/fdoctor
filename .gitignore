@@ -1,0 +1,10 @@
+/.externalToolBuilders/
+/.idea/
+/.settings/
+/bin/
+/doc/
+/docs/
+/target/
+/fdoctor.iml
+/.classpath
+/.project

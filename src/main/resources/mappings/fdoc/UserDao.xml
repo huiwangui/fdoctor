@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.UserDao">
+	<sql id="Base_Column_List" >
+	   uid, nickname, person_id, user_code, password, mobile, img, sex, status, email, create_time, 
+	   update_time, login_time, del_flag, height, weight, date_of_birth, authen_flag
+	 </sql>
+	 
+	<!-- 添加新用户 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.UserEntity" >
+	    insert into t_user (uid, nickname, person_id, 
+	      user_code, password, mobile, 
+	      img, sex, status, email, 
+	      create_time, update_time, login_time, 
+	      del_flag, height, weight, 
+	      date_of_birth, authen_flag)
+	    values (#{uid,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, #{personId,jdbcType=VARCHAR}, 
+	      #{userCode,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{mobile,jdbcType=VARCHAR}, 
+	      #{img,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+	      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{loginTime,jdbcType=TIMESTAMP}, 
+	      #{delFlag,jdbcType=VARCHAR}, #{height,jdbcType=DOUBLE}, #{weight,jdbcType=DOUBLE}, 
+	      #{dateOfBirth,jdbcType=DATE}, #{authenFlag,jdbcType=VARCHAR})
+	 </insert>
+	 <!-- 修改用户信息 -->
+	<update id="update" parameterType="com.boco.modules.fdoc.model.UserEntity" >
+	  update t_user
+	  <set >
+	    <if test="nickname != null" >
+	      nickname = #{nickname,jdbcType=VARCHAR},
+	    </if>
+	    <if test="personId != null" >
+	      person_id = #{personId,jdbcType=VARCHAR},
+	    </if>
+	    <if test="userCode != null" >
+	      user_code = #{userCode,jdbcType=VARCHAR},
+	    </if>
+	    <if test="password != null" >
+	      password = #{password,jdbcType=VARCHAR},
+	    </if>
+	    <if test="mobile != null" >
+	      mobile = #{mobile,jdbcType=VARCHAR},
+	    </if>
+	    <if test="img != null" >
+	      img = #{img,jdbcType=VARCHAR},
+	    </if>
+	    <if test="sex != null" >
+	      sex = #{sex,jdbcType=VARCHAR},
+	    </if>
+	    <if test="status != null" >
+	      status = #{status,jdbcType=VARCHAR},
+	    </if>
+	    <if test="email != null" >
+	      email = #{email,jdbcType=VARCHAR},
+	    </if>
+	    <if test="createTime != null" >
+	      create_time = #{createTime,jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="updateTime != null" >
+	      update_time = #{updateTime,jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="loginTime != null" >
+	      login_time = #{loginTime,jdbcType=TIMESTAMP},
+	    </if>
+	    <if test="delFlag != null" >
+	      del_flag = #{delFlag,jdbcType=VARCHAR},
+	    </if>
+	    <if test="height != null" >
+	      height = #{height,jdbcType=DOUBLE},
+	    </if>
+	    <if test="weight != null" >
+	      weight = #{weight,jdbcType=DOUBLE},
+	    </if>
+	    <if test="dateOfBirth != null" >
+	      date_of_birth = #{dateOfBirth,jdbcType=DATE},
+	    </if>
+	    <if test="authenFlag != null" >
+	      authen_flag = #{authenFlag,jdbcType=VARCHAR},
+	    </if>
+	  </set>
+	  where uid = #{uid,jdbcType=VARCHAR}
+	</update>
+	
+	<!-- 根据手机号获取用户 -->
+	<select id="getUserByMobile" parameterType="string" resultType="com.boco.modules.fdoc.model.UserEntity">
+		select <include refid="Base_Column_List"></include>
+		from t_user where mobile = #{0}
+	</select>
+	
+	<!-- 登录验证 -->
+	<select id="verifyUser" parameterType="com.boco.modules.fdoc.model.UserEntity" resultType="com.boco.modules.fdoc.model.UserEntity">
+		select <include refid="Base_Column_List"></include>
+		from t_user where mobile = #{mobile} and password = #{password} and del_flag = 0
+	</select>
+	
+	<!-- 获取除当前人以外电话为xxx的用户（用于转绑手机之前的判断） -->
+	<select id="getOtherUserByMobile" parameterType="com.boco.modules.fdoc.model.UserEntity" resultType="com.boco.modules.fdoc.model.UserEntity">
+		select <include refid="Base_Column_List"></include>
+		from t_user where mobile = #{mobile} and uid != #{uid}
+	</select>
+	
+	<!-- 根据uid获取用户 -->
+	<select id="getUserByUid" parameterType="string" resultType="com.boco.modules.fdoc.model.UserEntity">
+		select <include refid="Base_Column_List"></include>
+		from t_user where uid = #{0}
+	</select>
+	
+	<!-- 获取用户详情 -->
+	<select id="getUserDetail" parameterType="string" resultType="com.boco.modules.fdoc.vo.UserVo">
+		select a.uid, a.nickname, a.user_code, a.password, a.mobile, a.img, a.status, a.email, a.create_time, 
+	    a.update_time, a.login_time, a.del_flag, a.height, a.weight, a.authen_flag,b.*
+		from t_user a left join t_person_information b on a.person_id = b.person_id
+		where a.uid = #{0}
+	</select>
+	
+	<!-- 根据居民ID获取用户 -->
+	<select id="getUserByPersonId" parameterType="string" resultType="com.boco.modules.fdoc.model.UserEntity">
+		select <include refid="Base_Column_List"></include>
+		from t_user where person_id = #{0}
+	</select>
+	
+	<!-- 获取居民账号，用于推送 -->
+	<select id="getAccountsByPersonId" parameterType="string" resultType="string">
+		SELECT
+			a.uid
+		FROM
+			t_user a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		WHERE
+			b.person_id = #{0}
+	</select>
+</mapper>

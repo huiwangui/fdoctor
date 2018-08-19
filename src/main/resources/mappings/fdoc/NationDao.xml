@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.NationDao">
+	<sql id="Base_Column_List" >
+	   id, nation_code, nation_name
+	</sql>
+	
+	<!-- 根据民族代码获取民族 -->
+	<select id="getNationByCode" parameterType="string" resultType="com.boco.modules.fdoc.model.NationEntity">
+		select <include refid="Base_Column_List"/>
+		from t_nation where nation_code = #{0}
+	</select>
+</mapper>

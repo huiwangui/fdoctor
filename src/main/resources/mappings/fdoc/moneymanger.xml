@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.MoneyMangerDao">
+	
+	<select id="getMoneyMangerListInfo" parameterType="com.boco.modules.fdoc.model.MoneyMangerEntity" resultType="com.boco.modules.fdoc.model.MoneyMangerEntity">
+			select
+				a.id  as resid,
+				a.person_name,
+				a.sex,
+				a.date_of_birth,
+				year(now()) -year(date_of_birth) as  age,
+				a.id_card,
+				b.sign_time,
+				c.pack_name,
+				c.pack_price,
+				c.user_pay,
+				pack_price-user_pay as compensate
+			from
+				t_resident a,
+				t_user_doc_sign b,
+				t_sig_servicepack c
+			where
+				a.status != '1'
+			and a.id_card = b.id_card
+			and b.sig_id = c.id
+			and c.del_flag = 0
+			<if test="personName != '' and personName != null">
+				 and a.person_name LIKE CONCAT('%',#{personName},'%') 
+				
+			</if> 
+			<if test="idCard != null and idCard != ''">
+				 and   a.id_card LIKE CONCAT('%',#{idCard},'%')
+
+			</if>
+			
+	</select >
+	
+	<select id="capitalTotalMangerByLeader" parameterType="com.boco.modules.fdoc.model.MoneyMangerEntity" resultType="com.boco.modules.fdoc.model.MoneyMangerEntity">
+			select
+				sum(1) totalSig,
+				b.pack_name,
+				b.pack_price * sum(1) as totalPrice,
+				b.user_pay * sum(1) as totalUserPay,
+				b.pack_price * sum(1) - b.user_pay * sum(1) as totalCompensate,
+				b.pack_price * sum(1) * orgratio / 100 totalOrgin,
+				date_format(a.sign_time, '%Y-%m')  as countTime,
+				b.orgratio
+			from
+				t_user_doc_sign a,
+				t_sig_servicepack b
+			where
+				a.sig_id = b.id
+				and a.status != '2'
+				and b.del_flag = 0
+		  <if test="beginTime != '' and beginTime != null">
+				 and a.sign_time  &gt;= #{beginTime}
+				
+			</if>
+			<if test="endTime != null and endTime != ''">
+				 and a.sign_time  &lt;=  #{endTime}
+			</if>
+			group by
+				date_format(a.sign_time, '%Y-%m'),
+				b.id,
+				b.pack_name
+	</select >
+	
+	
+</mapper>

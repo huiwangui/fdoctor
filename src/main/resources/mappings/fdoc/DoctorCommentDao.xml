@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.DoctorCommentDao">
+	
+    <sql id="doctorCommentColumns">
+		uid,nickname,doc_id,obj_id,content,type,r_uid,r_nickname,create_time,update_time,stars,img,r_img,booking_id
+    </sql>
+	
+	<!-- 插入医生评论信息-->
+	<insert id="insert">
+		insert into t_doctor_comment(
+			<include refid="doctorCommentColumns"/>
+		) VALUES (
+			#{uid}, 
+			#{nickname},
+			#{docId},
+			#{objId},
+			#{content},
+			#{type},
+			#{rUid},
+			#{rNickname},
+			SYSDATE(),
+			SYSDATE(),
+			#{stars},
+			#{img},
+			#{rImg},
+			#{bookingId}
+		)
+	</insert>
+	
+	<update id="grade" parameterType="DoctorCommentEntity">
+		update t_doctor_comment set stars = #{stars} where id = #{id} and uid = #{uid}
+	</update>
+	
+	<delete id="delete" parameterType="string">
+		delete from t_doctor_comment where id = #{id}
+	</delete>
+	
+	<select id="getByDocId" parameterType="string" resultType="DoctorCommentEntity">
+		select id,
+			<include refid="doctorCommentColumns"/> 
+		from t_doctor_comment where doc_id = #{docId}
+	</select>
+	
+	<select id="getCommentLevelsCount" parameterType="com.boco.modules.fdoc.vo.DoctorDetailVo" resultType="integer">
+		select count(id) from t_doctor_comment where doc_id = #{id} and stars in (${commentLevel}) and type=1
+	</select>
+	
+	<select id="getCommentCount"  resultType="integer" parameterType="com.boco.modules.fdoc.vo.DoctorDetailVo">
+		select count(id) from t_doctor_comment where doc_id = #{id} and type=1
+	</select>
+	
+	<select id="getSingleDocComment" parameterType="com.boco.modules.fdoc.vo.DoctorDetailVo" resultType="DoctorCommentEntity">
+		select id,
+			<include refid="doctorCommentColumns"/>
+		 from t_doctor_comment where doc_id = #{id} and stars in (${commentLevel}) and type=1
+		 order by create_time desc
+			limit 0,2
+	</select>
+</mapper>

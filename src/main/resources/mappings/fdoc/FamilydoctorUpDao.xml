@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.FamilydoctorUpDao">
+	
+	 
+	
+	<!-- 获取已签约列表中根据身份证号查找到的居民信息 -->
+	<select id="getSignedListByIdCard" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.SignVo"> 			
+	   <!-- select bc.id,abc.person_name,abc.health_file_code,abc.id_card,abc.sex,abc.age,
+		abc.family_id,abc.family_file_code,abc.if_sign,abc.phone_number,bc.status,bc.disease_name,
+		bc.task_level,bc.up_way,bc.template_name,bc.up_date,bc.task_target,bc.follow_up_id
+		from  ( -->
+		select a.id,a.person_name,a.health_file_code,a.id_card,a.age_data,a.sex,
+		a.family_id,a.family_file_code,a.if_sign,a.phone_number		 
+		from t_person_information a right join t_user_doc_sign b on a.health_file_code=b.health_file_code
+		where b.`status`=1 and b.doc_id=#{docId}
+		 <if test='way == "1" and info != null and info != ""'>
+				and (a.id_card like CONCAT('%', #{info}, '%') or a.person_name like CONCAT('%', #{info}, '%'))
+	    </if>
+		<if test='way == "2" and info != null and info != ""'>
+				AND a.id_card = #{info}
+		</if> 
+		<if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+						OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+		
+		<!--<if test="regionCode != '' and regionCode != null">
+			and a.region_code in(${regionCode})
+		</if>
+		) abc INNER join  t_up_plan bc on abc.health_file_code=bc.health_file_code-->
+	 
+  
+	</select>
+	<!--获取已签约列表中未执行的随访计划或已完成随访计划列表总数-->
+	<select id="getSignedListCountByFinishFlag" resultType="int" parameterType="com.boco.modules.fdoc.vo.SignVo">
+		select  count( abc.person_name)
+		from (select a.person_name,a.health_file_code,a.id_card,a.sex,year(now())-year(a.date_of_birth) age,a.phone_number
+			  from t_person_information a right join t_user_doc_sign b on a.health_file_code=b.health_file_code
+			  where b.`status`=1 and b.doc_id=#{docId} 
+					 <if test="regionList != null">
+						AND (
+						<trim prefixOverrides="OR">
+							<foreach collection="regionList" item="itemCode">
+									OR a.region_code like CONCAT(#{itemCode},'%')
+							</foreach>
+						</trim>
+						)
+					</if>
+					 ) abc inner JOIN t_up_plan bc on abc.health_file_code=bc.health_file_code			  
+ 			<where>
+	 			<if test="followUpFlag==1">					
+			        bc.status = 1
+				</if>
+				<if test="followUpFlag==0">
+				    bc.status = 0
+				</if>
+ 			</where>
+ 			
+		
+	</select>
+	<!-- 获取已签约列表中未执行的随访计划或已完成随访计划列表 -->
+	<select id="getSignedListByFinishFlag" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.SignVo">
+		select  abc.person_name,abc.health_file_code,abc.id_card,abc.sex,abc.age_data,abc.phone_number,bc.id,bc.task_level,bc.up_way,bc.template_name,bc.disease_name,bc.up_date,bc.task_target,bc.follow_up_id
+		from (select a.person_name,a.health_file_code,a.id_card,a.sex,a.age_data,a.phone_number
+			  from t_person_information a right join t_user_doc_sign b on a.health_file_code=b.health_file_code
+			  where b.`status`=1 and b.doc_id=#{docId} 
+					 <if test="regionList != null">
+						AND (
+						<trim prefixOverrides="OR">
+							<foreach collection="regionList" item="itemCode">
+									OR a.region_code like CONCAT(#{itemCode},'%')
+							</foreach>
+						</trim>
+						)
+					</if>
+					<!--<if test="regionCode != '' and regionCode != null">
+						and a.region_code in(${regionCode})
+					</if>-->
+					 ) abc inner JOIN t_up_plan bc on abc.health_file_code=bc.health_file_code			  
+		 			<where>
+			 			<if test="followUpFlag==1">					
+					        bc.status = 1
+						</if>
+						<if test="followUpFlag==0">
+						    bc.status = 0
+						</if>
+		 			</where>
+ 			
+		
+	</select>
+	
+	<!-- 获取指定的某人未完成的随访计划(根据疾病名称) -->
+	<select id="getunFinishSignedListBydiseaseId" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select a.person_name,a.health_file_code,a.id_card,a.sex,year(now())-year(a.date_of_birth) age,a.phone_number,c.id,c.task_level,c.up_way,c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id
+		,c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status = #{status}
+		 and c.disease_name =#{diseaseName}
+		<if test="regionCode != '' and regionCode != null">
+			and a.region_code in(${regionCode})
+		</if>		 
+		<if test="healthFileCode != '' and healthFileCode!= null">
+			and a.health_file_code = #{healthFileCode}  
+		</if>
+	</select>
+	
+	<!-- 获取指定的某人未完成的随访计划(根据随访计划id) -->
+	<select id="getunFinishSignedListById" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select abc.person_name,abc.health_file_code,abc.id_card,abc.sex, abc.age,abc.phone_number,c.id,c.task_level,c.up_way,c.template_name,
+	           c.disease_name,c.up_date,c.task_target,c.follow_up_id,c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id
+	  	from (select a.person_name,a.health_file_code,a.id_card,a.sex,year(now())-year(a.date_of_birth) age,a.phone_number 
+		     from t_person_information a right join t_user_doc_sign b on a.health_file_code=b.health_file_code  
+		     where b.`status`=1 and b.doc_id=#{docId}   
+			 <if test="regionList != null">
+				AND (
+				<trim prefixOverrides="OR">
+					<foreach collection="regionList" item="itemCode">
+							OR a.region_code like CONCAT(#{itemCode},'%')
+					</foreach>
+				</trim>
+				)
+			</if>
+		 
+			<if test="healthFileCode != '' and healthFileCode!= null">
+				and a.health_file_code = #{healthFileCode}  
+			</if>) abc inner join t_up_plan c on abc.health_file_code=c.health_file_code  
+		where  c.status = #{status} and c.id =#{id}
+		<!--select a.person_name,a.health_file_code,a.id_card,a.sex,year(now())-year(a.date_of_birth) age,a.phone_number,c.id,c.task_level,c.up_way,c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id
+		,c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status = #{status}
+		 and c.id =#{id}
+		 <if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+						OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+		 
+		<if test="healthFileCode != '' and healthFileCode!= null">
+			and a.health_file_code = #{healthFileCode}  
+		</if>-->
+	</select>
+	<!-- 获取某人已完成的随访计划列表或未完成的随访计划列表总数  对接-->
+	<select id="getFinishSignedListCountByHealthFileCode" resultType="int" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		 select count(abc.health_file_code) 	   
+		  from (select  a.health_file_code
+			from t_person_information a right join t_user_doc_sign b on a.health_file_code=b.health_file_code  
+			 where b.`status`=1 and b.doc_id=#{docId} 
+			 <if test="regionList != null">
+				AND (
+				<trim prefixOverrides="OR">
+					<foreach collection="regionList" item="itemCode">
+							OR a.region_code like CONCAT(#{itemCode},'%')
+					</foreach>
+				</trim>
+				)
+			</if>
+			) abc inner join t_up_plan c on abc.health_file_code =c.health_file_code
+			where c.status = #{status} and abc.health_file_code = #{healthFileCode}
+		<!--select count(a.person_name) 		 
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status = #{status}
+		 <if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+						OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>	 
+		<if test="healthFileCode != '' and healthFileCode!= null">
+			and a.health_file_code = #{healthFileCode}  
+		</if>-->
+	</select>
+	
+	<!-- 根据居民健康档案编号查询随访记录   -->
+	<select id="getUpplanByHealthFileCode" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+         select health_file_code,`status` from t_up_plan where health_file_code=#{healthFileCode} ORDER BY up_date DESC limit 1	 
+	</select>
+	
+	
+	
+	<!-- 获取某人已完成的随访计划列表或未完成的随访计划列表  对接-->
+	<select id="getFinishSignedListByHealthFileCode" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+	  select abc.person_name,abc.health_file_code,abc.id_card,abc.sex, abc.age_data,abc.phone_number,c.task_level,c.up_way,
+		c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id,c.id
+	  from (select a.person_name,a.health_file_code,a.id_card,a.sex,a.age_data,a.phone_number 	 
+		from t_person_information a right join t_user_doc_sign b on a.health_file_code=b.health_file_code  
+		 where b.`status`=1 and b.doc_id=#{docId} 
+		 <if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+						OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+		) abc inner join t_up_plan c on abc.health_file_code =c.health_file_code
+		where c.status = #{status} and abc.health_file_code = #{healthFileCode}
+	<!--	select a.person_name,a.health_file_code,a.id_card,a.sex,year(now())-year(a.date_of_birth) age,a.phone_number,c.task_level,c.up_way,
+		c.template_name,c.disease_name,c.up_date,c.task_target,c.follow_up_id,c.id
+		from t_person_information a , t_user_doc_sign b,t_up_plan c where a.health_file_code=b.health_file_code and
+		  b.`status`=1 and b.doc_id=#{docId} 	and a.health_file_code =c.health_file_code and  c.status = #{status}
+		 <if test="regionList != null">
+			AND (
+			<trim prefixOverrides="OR">
+				<foreach collection="regionList" item="itemCode">
+						OR a.region_code like CONCAT(#{itemCode},'%')
+				</foreach>
+			</trim>
+			)
+		</if>
+-->
+		<!--<if test="regionCode != '' and regionCode != null">
+			and a.region_code in(${regionCode})
+		</if>	-->	 
+	<!--	<if test="healthFileCode != '' and healthFileCode!= null">
+			and a.health_file_code = #{healthFileCode}  
+		</if>-->
+	</select>
+	
+	<!--删除某人制定的未执行随访计划 (根据疾病名称) -->
+	<delete id="deleteUnFinishUpPlanByHealthFileCodeAndDiseaseId" parameterType="com.boco.modules.fdoc.vo.UpPlanSignVo">
+	 	delete from t_up_plan where STATUS=0  AND disease_name=#{diseaseName}  
+	 	<if test="healthFileCode != '' and healthFileCode!= null">
+			and health_file_code = #{healthFileCode}  
+		</if> 
+	</delete>
+	
+	<!--删除为某人制定的未执行随访计划 (根据随访计划id) -->
+	<delete id="deleteUnFinishUpPlanById" parameterType="com.boco.modules.fdoc.vo.UpPlanSignVo">
+	 	delete from t_up_plan where STATUS=0  AND id=#{id}  
+	 	<if test="healthFileCode != '' and healthFileCode!= null">
+			and health_file_code = #{healthFileCode}  
+		</if> 
+	</delete>
+	
+	<!-- 已签约列表中根据随访计划id查找随访计划 -->
+	<select id="getUpPlan" resultType="com.boco.modules.fdoc.vo.UpPlanVo" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+		select id,health_file_code,up_date,task_level,up_way,task_target,template_name,`status`,disease_name,follow_up_id 
+		from  t_up_plan 
+		<where>
+			<if test=" id !=null">
+	         id  = #{id}
+	        </if>
+		</where>	
+	</select>
+	
+   <!-- 已签约列表中根据随访计划id更改随访记录 -->
+   <update id="updateUpPlan" parameterType="com.boco.modules.fdoc.vo.UpPlanVo">
+   		UPDATE t_up_plan set follow_up_id=#{followUpId},`status`=#{status},up_date=#{upDate},up_way=#{upWay}  where id=#{id}
+   </update>
+ 
+	 
+	
+</mapper>

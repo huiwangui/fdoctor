@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.AdDao">
+	<sql id="adColumns">
+		ad.id,
+		ad.title,
+		ad.tenant,
+		ad.url,
+		ad.img,
+		ad.loc,
+		ad.add_time,
+		update_time,
+		ad.add_person
+	</sql>
+	<!-- 获取广告列表 -->
+	<select	id="findAdList" resultType="AdEntity">
+		SELECT 
+		<include refid="adColumns"/> 
+		FROM t_ad ad		
+	</select>
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.SigRecordDao">
+
+	<!-- 查询当前医生下的签约人员信息 -->
+	<select	id="querySignInfo" parameterType="com.boco.modules.fdoc.vo.SigRecordVo" resultType="com.boco.modules.fdoc.vo.SigRecordVo">
+		SELECT
+			b.person_name,
+			b.sex,
+			(YEAR (CURDATE()) - YEAR (b.date_of_birth)) age,
+			b.id_card,
+			date_format(a.sign_time, '%Y-%c-%d') sign_time,
+			d.pack_name,
+			a.sig_id,
+			b.id resId
+		FROM
+			t_user_doc_sign a,
+			t_resident b,
+			t_doctor c,
+			t_sig_servicepack d
+		WHERE
+			a.doc_uid = c.doc_uid
+		AND a.id_card = b.id_card
+		AND a.sig_id = d.id
+		AND a.STATUS &lt;&gt; 2
+		AND c.id = #{docId}
+			<if test="personName != null and personName != ''">
+				AND b.person_name like CONCAT('%',#{personName},'%')
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND b.id_card = #{idCard}
+			</if>
+	</select>
+	
+	<!-- 查询指定服务包下的服务项目 -->
+	<select	id="queryServiceDetails" parameterType="int" resultType="com.boco.modules.fdoc.vo.SigRecordVo">
+		SELECT
+			CONCAT(id,';',frequency) details_id,
+			service_name
+		FROM
+			t_servicepack_details a
+		WHERE
+			EXISTS (
+				SELECT
+					1
+				FROM
+					`t_sigservicepack_details_relation`
+				WHERE
+					del_flag = '0'
+				AND details_id = a.id
+				AND sig_id = #{sigId}
+			)
+	</select>
+	
+	<!-- 查询服务的家庭医生 -->
+	<select	id="queryFamdoctor" resultType="com.boco.modules.fdoc.vo.SigRecordVo">
+		SELECT
+			id docId,name docName
+		FROM
+			t_doctor a,
+			t_user b
+		WHERE
+			b.sign_user = 2
+		AND b.uid = a.doc_uid
+		AND b.del_flag=0
+		AND EXISTS (SELECT 1 FROM t_famdoctor c WHERE c.uid = a.doc_uid)
+	</select>
+	
+	<sql id="recordColumns">
+		resId,   
+		sig_id,   
+		details_id, 
+		service_Data,   
+		service_details, 
+		doc_Id,   
+		doc_name,  
+		service_address, 
+		remarks,
+		istimely,   
+		createBy,  
+		createTime,  
+		updateBy,  
+		updateTime
+	</sql>
+	
+	<!-- 保存服务记录信息 -->
+	<insert id="saverecord" parameterType="SigRecordEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_service_record(
+		 <include refid="recordColumns" />
+		)VALUES(
+		 #{resId},
+		 #{sigId},
+		 #{detailsId},
+		 #{serviceData},
+		 #{serviceDetails},
+		 #{docId},
+		 #{docName},
+		 #{serviceAddress},
+		 #{remarks},
+		 #{istimely},
+		 #{createBy},
+		 #{createTime},
+		 #{updateBy},
+		 #{updateTime}
+		)
+	</insert>
+	
+	<!-- 查询服务该服务在服务记录的次数 -->
+	<select	id="queryCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			t_service_record
+		WHERE
+			resId = #{resId}
+		AND details_id = #{detailsId}
+	</select>
+	
+	<!-- 查询该居民的服务记录 -->
+	<select	id="queryRecord" parameterType="com.boco.modules.fdoc.vo.SigRecordVo" resultType="com.boco.modules.fdoc.vo.SigRecordVo">
+		SELECT
+			b.service_name,
+			count(*) count,
+			a.service_details
+		FROM
+			t_service_record a,
+			t_servicepack_details b
+		WHERE
+			a.details_id = b.id
+			AND a.resId = #{resId}
+			group by a.details_id
+			ORDER BY a.details_id
+	</select>
+</mapper>

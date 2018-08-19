@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.DiseaseLabelDao">
+	<!-- 新增慢病标签 -->
+	<insert id="insertLabel" parameterType="com.boco.modules.fdoc.model.DiseaseLabelEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into t_disease_label (doc_team_id, label_name, 
+	      default_flag,disease_code)
+	    values (#{docTeamId,jdbcType=VARCHAR}, #{labelName,jdbcType=VARCHAR}, 
+	      #{defaultFlag,jdbcType=VARCHAR},#{diseaseCode})
+	</insert>
+	
+	<!-- 修改慢病标签 -->
+	<update id="updateLabel" parameterType="com.boco.modules.fdoc.model.DiseaseLabelEntity">
+		update t_disease_label set  label_name = #{labelName} ,disease_code=#{diseaseCode} where id = #{id}
+	</update>
+	
+	<!-- 删除慢病标签 -->
+	<delete id="deleteLabel" parameterType="integer">
+		delete from t_disease_label where id = #{0}
+	</delete>
+	
+	<!-- 查找标签ID对应疾病关系 -->
+	<!-- 查找标签ID对应疾病关系 -->
+	<select id="selectlableid" parameterType="com.boco.modules.fdoc.model.DiseaseLabelEntity" resultType="Integer">
+		SELECT id FROM t_disease_label WHERE doc_team_id=#{docTeamId}
+		<if test="diseaseCode != null ">
+			AND disease_code=#{diseaseCode}
+		</if>
+		<if test="labelName != null and labelName != ''">
+			AND label_name=#{labelName}
+		</if>
+	</select >
+	
+	<!-- 新增对应关系 -->
+	<insert id="insertRelation" parameterType="com.boco.modules.fdoc.model.DiseaseLabelPersonRelationEntity">
+		insert into t_disease_label_person_relation (label_id, person_id
+	      )
+	    values (#{labelId,jdbcType=INTEGER}, #{personId,jdbcType=VARCHAR}
+	      )
+	</insert>
+	
+	<!-- 清空标签下的人员 -->
+	<delete id="deleteRelationsInLabel" parameterType="integer">
+		delete from t_disease_label_person_relation where label_id = #{0}
+	</delete>
+	
+	<!-- 获取标签列表 -->
+	<select id="getLabelList" parameterType="string" resultType="com.boco.modules.fdoc.vo.DiseaseLabelVo">
+		SELECT
+			a.label_name,
+			a.id,
+			a.default_flag,
+			CASE
+		WHEN b.ct IS NULL THEN
+			0
+		ELSE
+			b.ct
+		END personCount
+		FROM
+			t_disease_label a
+		LEFT JOIN (
+			SELECT
+				label_id,
+				count(person_id) ct
+			FROM
+				t_disease_label_person_relation
+			GROUP BY
+				label_id
+		) b ON a.id = b.label_id
+		WHERE
+			a.doc_team_id = #{0}
+	</select>
+	
+	<!-- 查询不在标签中的签约人员 -->
+	<select id="getPersonNotInLabel" parameterType="com.boco.modules.fdoc.vo.DiseaseLabelVo" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+			a.person_id,
+			a.person_code,
+			a.person_name,
+			a.sex,
+			a.id_card,
+			DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(a.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		FROM
+			t_person_information a
+		LEFT JOIN t_user_doc_sign b ON a.person_id = b.person_id
+		WHERE
+			b.doc_team_id = #{docTeamId}
+		AND a.person_id NOT IN (
+			SELECT
+				person_id
+			FROM
+				t_disease_label_person_relation
+			WHERE
+				label_id = #{id}
+		)
+		AND b.`status` = 1
+		<if test="personName != null and personName != ''">
+			AND a.person_name LIKE CONCAT('%', #{personName}, '%')
+		</if>
+	</select>
+	
+	<!-- 查询不在标签中的签约人员总数  -->
+	<select id="getPersonNotInLabelCount" parameterType="com.boco.modules.fdoc.vo.DiseaseLabelVo" resultType="integer">
+		SELECT
+			count(a.person_id)
+		FROM
+			t_person_information a
+		LEFT JOIN t_user_doc_sign b ON a.person_id = b.person_id
+		WHERE
+			b.doc_team_id = #{docTeamId}
+		AND a.person_id NOT IN (
+			SELECT
+				person_id
+			FROM
+				t_disease_label_person_relation
+			WHERE
+				label_id = #{id}
+		)
+		AND b.`status` = 1
+		<if test="personName != null and personName != ''">
+			AND a.person_name LIKE CONCAT('%', #{personName}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看标签中的人员 -->
+	<select id="getPersonInLabel" parameterType="com.boco.modules.fdoc.vo.DiseaseLabelVo" resultType="com.boco.modules.fdoc.vo.PersonInformationVo">
+		SELECT
+			a.person_id,
+			a.person_code,
+			a.person_name,
+			a.sex,
+			a.id_card,
+			DATE_FORMAT(
+				FROM_DAYS(
+					TO_DAYS(NOW()) - TO_DAYS(a.date_of_birth)
+				),
+				'%Y'
+			) + 0 AS age
+		FROM
+			t_person_information a
+		LEFT JOIN t_disease_label_person_relation b ON a.person_id = b.person_id
+		WHERE
+			b.label_id = #{id}
+	</select>
+	
+	<!-- 查看标签中的人员数量 -->
+	<select id="getPersonInLabelCount" parameterType="com.boco.modules.fdoc.vo.DiseaseLabelVo" resultType="integer">
+		SELECT
+			count(a.person_id)
+		FROM
+			t_person_information a
+		LEFT JOIN t_disease_label_person_relation b ON a.person_id = b.person_id
+		WHERE
+			b.label_id = #{id}
+	</select>
+	
+	<!-- 获取标签中的用户账号 -->
+	<select id="getUsersInLabel" parameterType="com.boco.modules.fdoc.vo.DiseaseLabelVo" resultType="string">
+		SELECT
+			a.uid
+		FROM
+			t_user a
+		LEFT JOIN t_disease_label_person_relation b ON a.person_id = b.person_id
+		WHERE
+			b.label_id IN (${ids})
+	</select>
+	
+	<!-- 获取某人的标签list，其中选中的标签用selectFlag标示 -->
+	<select id="getLabelListWithSelectFlag" parameterType="com.boco.modules.fdoc.vo.DiseaseLabelVo" resultType="com.boco.modules.fdoc.vo.DiseaseLabelVo">
+		SELECT
+			a.id,a.doc_team_id,a.label_name,a.default_flag, CASE
+		WHEN b.id IS NULL THEN
+			0
+		ELSE
+			1
+		END select_flag
+		FROM
+			t_disease_label a
+		LEFT JOIN (
+			SELECT
+				id,
+				label_id
+			FROM
+				t_disease_label_person_relation
+			WHERE
+				person_id = #{personId}
+		) b ON a.id = b.label_id
+		WHERE
+			a.doc_team_id = #{docTeamId}
+	</select>
+	
+	<!-- 获取对应关系（主要用于判断重复） -->
+	<select id="getRelation" parameterType="com.boco.modules.fdoc.model.DiseaseLabelPersonRelationEntity" resultType="com.boco.modules.fdoc.model.DiseaseLabelPersonRelationEntity">
+		select id,label_id, person_id from t_disease_label_person_relation
+		where label_id = #{labelId} and person_id = #{personId}
+	</select>
+	
+	<!-- 删除对应关系 -->
+	<delete id="deleteRelation" parameterType="com.boco.modules.fdoc.model.DiseaseLabelPersonRelationEntity">
+		delete from t_disease_label_person_relation where label_id = #{labelId} and person_id = #{personId}
+	</delete>
+	
+	<!-- 获取居民所在的标签集合 -->
+	<select id="getLabelsByPersonId" parameterType="string" resultType="com.boco.modules.fdoc.model.DiseaseLabelEntity">
+		SELECT
+			a.id,
+			a.label_name
+		FROM
+			t_disease_label a
+		LEFT JOIN t_disease_label_person_relation b ON a.id = b.label_id
+		WHERE
+			b.person_id = #{0}
+	</select>
+</mapper>

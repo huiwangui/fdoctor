@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.statistics.StatisticsDayTwoBasedataDao">
+
+	<!-- 获取最近一条统计信息 -->
+	<select id="getLastInfo" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTwoBasedataEntity">
+		SELECT * from t_statistics_day_two_basedata where type=0  ORDER BY create_time DESC LIMIT 1
+	</select>
+
+	<!-- 修改统计信息 -->
+	<select id="updates" parameterType="com.boco.modules.fdoc.model.statistics.StatisticsDayTwoBasedataEntity">
+		UPDATE  t_statistics_day_two_basedata set id=#{id}, hyper_count=#{hyperCount},dabetes_count= #{dabetesCount},
+		 child_count=#{childCount},	cj_count=#{cjCount},old_man_count=#{oldManCount},profile_count=#{profileCount},
+		 health_asse_count=#{healthAsseCount},interro_count=#{interroCount},health_edu_count=#{healthEduCount},
+		hyper_person_desease_total=#{hyperPersonDeseaseTotal},hyper_person_desease_estimatel=#{hyperPersonDeseaseEstimatel},
+		person_over_eighteen=#{personOverEighteen},	latest_hyper_normal_count=#{latestHyperNormalCount},
+		dabetes_person_desease_total=#{dabetesPersonDeseaseTotal},	dabetes_person_desease_estimatel=#{dabetesPersonDeseaseEstimatel},
+		latest_dabetes_normal_count=#{latestDabetesNormalCount},type=#{type},team_id=#{teamId},	org_id=#{orgId},other_examin_count=#{otherExaminCount},
+		statistics_date=#{statisticsDate},create_time=#{createTime},region_code=#{regionCode}
+		where id=#{id}
+	</select>
+
+
+	<select id="getOneByTeamId"   parameterType="string" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTwoBasedataEntity">
+		SELECT * from t_statistics_day_two_basedata where team_id=#{0}   ORDER BY create_time DESC LIMIT 1
+	</select>
+	<select id="getRegionEstimatelByTeamId"   parameterType="string" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTwoBasedataEntity">
+		SELECT
+	te.dabetes_estimatel dabetes_person_desease_estimatel,
+	te.hyper_estimatel hyper_person_desease_estimatel
+FROM
+	t_region_estimatel te
+WHERE
+	te.region_code = (
+		SELECT DISTINCT
+			tt.region_code
+		FROM
+			t_doctor tt
+		WHERE
+			tt.team_id=#{0}
+		ORDER BY
+			tt.region_code DESC
+		LIMIT 1
+	) ;
+	</select>
+
+</mapper>

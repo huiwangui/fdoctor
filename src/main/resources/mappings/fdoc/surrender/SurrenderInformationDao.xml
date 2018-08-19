@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.boco.modules.fdoc.dao.surrender.SurrenderInformationDao" >
+
+  <sql id="Base_Column_List" >
+    id, request_id, region_code, org_id, service_pack_value, sign_img, sign_type, sign_remark, 
+    sign_time, due_time,expert_id
+  </sql>
+  	<!-- 根据personid获取签约年限 -->
+	<select id="getYearOfSignByPersonId" parameterType="com.boco.modules.fdoc.model.surrender.SurrenderRequestEntity" resultType="integer">
+		select 		 
+		YEAR (a.due_time) - YEAR (a.sign_time)
+		from t_surrender_information a,t_surrender_request b
+		where a.request_id=b.id  
+		and b.person_id = #{personId}  
+		and b.doc_team_id =#{docTeamId}
+	</select>
+  
+</mapper>

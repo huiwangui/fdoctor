@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.InoculationDao">
+	<sql id="userRelationsColumns">
+		a.id,a.uid,a.user_name,a.name,a.id_card,a.tel,a.sex,a.age,a.relation,a.img,a.area,a.contact_person,a.patient_card_num,a.create_time,a.update_time
+    </sql>
+    
+    <!-- 查询该家庭没有接种的人员信息 -->
+	
+	<!-- 预约接种 -->
+	<insert id="vaccinate" parameterType="com.boco.modules.fdoc.vo.InoculationVo" useGeneratedKeys="true" keyProperty="id">
+		insert into t_inoculation(
+			inoculation_num,id_card,detail_id,vaccine_source_id,ino_date,period,create_time,status,uid,pay_status
+		) VALUES (
+			#{inoculationNum}, 
+			#{idCard},
+			#{detailId},
+			#{vaccineSourceId},
+			FROM_UNIXTIME(#{inoDate}),
+			#{period},
+			#{createTime},
+			#{status},
+			#{uid},
+			#{payStatus}
+		)
+	</insert>
+	
+	<!-- 修改订单号 -->
+	<update id="updateNum">
+		update t_inoculation set inoculation_num=#{0} where id=#{1}
+	</update>
+	
+	<!-- 获取已接种的人数 -->
+	<select id="getInoNum" parameterType="string" resultType="integer">
+		select count(a.id) from 
+			t_inoculation a left join t_vaccine_source b on a.vaccine_source_id=b.id
+			left join  t_doctor c on b.doc_id=c.id
+			where c.doc_uid=#{0} and a.`status`=#{1}
+	</select>
+	
+	<select id="getInoList" resultType="com.boco.modules.fdoc.vo.InoculationVo" parameterType="com.boco.modules.fdoc.vo.InoculationVo">
+		select a.id,a.person_name,a.id_card,UNIX_TIMESTAMP(b.ino_date)*1000 ino_date,d.name vaccineName,b.period,b.status,b.inoculation_num,h.name hospName,b.pay_status
+		from t_resident a right join t_inoculation b on a.id_card=b.id_card
+		left join t_vaccine_detail c on b.detail_id=c.id
+		left join t_vaccine d on c.vaccine_id=d.id 
+		left join t_vaccine_source e on b.vaccine_source_id=e.id
+		left join t_doctor f on e.doc_id=f.id
+		left join t_hospital h on f.hosp_id=h.id
+		<where>     
+	        <if test="status!=null and status!='' ">     
+	            b.`status`=#{status}
+	        </if>     
+	        <if test="docId!= null and docId!= 0 ">     
+	            AND e.doc_id = #{docId}      
+	        </if> 
+	        <if test="uid!= null and uid!= '' ">     
+	            AND b.uid = #{uid}      
+	        </if>    
+    	</where> 
+    	order by b.ino_date desc
+	</select>
+	
+	<select id="getNum" resultType="integer" parameterType="com.boco.modules.fdoc.vo.InoculationVo">
+		select count(id)
+		from t_inoculation where id_card=#{idCard} and vaccine_source_id=#{vaccineSourceId} and status != -1
+	</select>
+	
+	<!-- 修改接种预约状态 -->
+	<update id="updateBookingStatus">
+		update t_inoculation set status=#{1} where id=#{0}
+	</update>
+</mapper>

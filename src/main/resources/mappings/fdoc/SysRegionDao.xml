@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.SysRegionDao">
+
+	<!-- 查询子级区划列表 -->
+	<select id="getChildrenRegions" parameterType="string" resultType="com.boco.modules.fdoc.model.SysRegionEntity">
+		SELECT
+			id,
+			region_code,
+			`name`,
+			full_name,
+			parent_code
+		FROM
+			t_sys_region
+		WHERE
+			parent_code = #{0}
+	</select>
+	
+	<!-- 查询父级区划 -->
+	<select id="getParentRegion" parameterType="string" resultType="com.boco.modules.fdoc.model.SysRegionEntity">
+		SELECT
+			id,
+			region_code,
+			`name`,
+			full_name,
+			parent_code
+		FROM
+			t_sys_region
+		WHERE
+			region_code = (
+				SELECT
+					parent_code
+				FROM
+					t_sys_region
+				WHERE
+					region_code = #{0}
+			)
+	</select>
+	
+	<!-- 根据regionCode获取区划 -->
+	<select id="getRegionByCode" parameterType="string" resultType="com.boco.modules.fdoc.model.SysRegionEntity">
+		SELECT
+			id,
+			region_code,
+			`name`,
+			full_name,
+			parent_code
+		FROM
+			t_sys_region
+		WHERE
+			region_code = #{0}
+	</select>
+	
+	<!-- 查询子级区划列表（避开默认区划影响） -->
+	<select id="getAccurateChildrenRegions" parameterType="string" resultType="java.util.Map">
+		SELECT
+			id,
+			region_code regionCode,
+			`name`,
+			full_name fullName,
+			parent_code parentCode
+		FROM
+			t_sys_region
+		WHERE
+			parent_code = #{0}
+	</select>
+	
+	<!-- 根据id获取区划 -->
+	<select id="getRegionById" parameterType="string" resultType="com.boco.modules.fdoc.model.SysRegionEntity">
+		SELECT
+			id,
+			region_code,
+			`name`,
+			full_name,
+			parent_code
+		FROM
+			t_sys_region
+		WHERE
+			id = #{0}
+	</select>
+</mapper>

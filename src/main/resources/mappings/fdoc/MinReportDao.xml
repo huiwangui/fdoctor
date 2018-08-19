@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.MinReportDao">
+	<sql id="ReportColumns">
+		rep.Id,
+		rep.RequestNo,
+		rep.PersonCode,
+		rep.PersonType,
+		rep.PersonName,
+		rep.EnglishName,
+		rep.Gender,
+		rep.IdCode,
+		rep.ArchiveCode,
+		rep.HealthCode,
+		rep.Birthday,
+		rep.Nation,
+		rep.Race,
+		rep.Photo,
+		rep.Address,
+		rep.Height,
+		rep.Weight,
+		rep.WaistLine,
+		rep.BMI,
+		rep.LeftSys,
+		rep.LeftDia,
+		rep.RightSys,
+		rep.RightDia,
+		rep.PR,
+		rep.HR,
+		rep.SpO2,
+		rep.Temp,
+		rep.Resp,
+		rep.Ecg_Data EcgData,
+		rep.Ecg_Report RcgReport,
+		rep.UrineLeu,
+		rep.UrinePH,
+		rep.UrineNit,
+		rep.UrineGlu,
+		rep.UrinePro,
+		rep.UrineVC,
+		rep.UrineSG,
+		rep.UrineUbg,
+		rep.UrineBil,
+		rep.UrineKet,
+		rep.UrineBld,
+		rep.BeforeMealFbg,
+		rep.AfterMealFbg,
+		rep.WBC,
+		rep.Lymph,
+		rep.Mid,
+		rep.Gran,
+		rep.LymphPercent,
+		rep.MidPercent,
+		rep.GranPercent,
+		rep.RBC,
+		rep.HGB,
+		rep.MCV,
+		rep.MCH,
+		rep.MCHC,
+		rep.`RDW-CV` RDWCV,
+		rep.`RDW-SD` RDWSD,
+		rep.HCT,
+		rep.PLT,
+		rep.MPV,
+		rep.PDW,
+		rep.PCT,
+		rep.`P-LCR` PLCR,
+		rep.WBCHistogram,
+		rep.RBCHistogram,
+		rep.PLTHistogram,
+		rep.UrineType,
+		rep.U120Unit,
+		rep.U120LEU,
+		rep.U120LEUSymbol,
+		rep.U120LEUFlag,
+		rep.U120PH,
+		rep.U120PHSymbol,
+		rep.U120PHFlag,
+		rep.U120NIT,
+		rep.U120NITSymbol,
+		rep.U120NITFlag,
+		rep.U120GLU,
+		rep.U120GLUSymbol,
+		rep.U120GLUFlag,
+		rep.U120PRO,
+		rep.U120PROSymbol,
+		rep.U120PROFlag,
+		rep.U120SG,
+		rep.U120SGSymbol,
+		rep.U120SGFlag,
+		rep.U120URO,
+		rep.U120UROSymbol,
+		rep.U120UROFlag,
+		rep.U120BIL,
+		rep.U120BILSymbol,
+		rep.U120BILFlag,
+		rep.U120KET,
+		rep.U120KETSymbol,
+		rep.U120KETFlag,
+		rep.U120BLO,
+		rep.U120BLOSymbol,
+		rep.U120BLOFlag,
+		rep.U120CA,
+		rep.U120CASymbol,
+		rep.U120CAFlag,
+		rep.U120ALBU,
+		rep.U120ALBUSymbol,
+		rep.U120ALBUFlag,
+		rep.U120ASC,
+		rep.U120ASCSymbol,
+		rep.U120ASCFlag,
+		rep.U120CRE,
+		rep.U120CRESymbol,
+		rep.U120CREFlag,
+		rep.U120PC,
+		rep.U120PCSymbol,
+		rep.U120PCFlag,
+		rep.MissionHB,
+		rep.MissionUnit,
+		rep.MissionHCT,
+		rep.Mean,
+		rep.cho,
+		rep.tg,
+		rep.hdl,
+		rep.ldl,
+		rep.SaasId,
+		rep.OrgId,
+		rep.Creater,
+		rep.CreateDate,
+		rep.DeviceSN,
+		rep.SourceType,
+		rep.Version,
+		rep.IsSync
+	</sql>
+	<!-- 获取检查列表 -->
+	<select	id="findList" parameterType="com.boco.modules.fdoc.vo.MinReportVo" resultType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		SELECT 
+		<include refid="ReportColumns"/> 
+		FROM report_healthmonitor rep
+		WHERE rep.IdCode=#{idCode}
+		ANd rep.Version >= #{startTime}
+		ANd rep.Version &lt;= #{endTime}	
+		order by rep.Version desc
+	</select>
+	
+	<select id="getReport" parameterType="string" resultType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		SELECT 
+		<include refid="ReportColumns"/> 
+		FROM report_healthmonitor rep
+		WHERE rep.Id = #{id}
+		
+	</select>
+	
+	<select id="getSihealReport" parameterType="com.boco.modules.fdoc.vo.MinReportVo" resultType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		SELECT 
+		<include refid="ReportColumns"/> 
+		FROM report_healthmonitor rep
+		WHERE rep.IdCode=#{idCode}
+		ANd rep.CreateDate >= #{startTime}
+		ANd rep.CreateDate &lt;= #{endTime}
+		
+	</select>
+	
+	<!-- 新增血氧数据 -->
+	<insert id="insertSpoInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,SpO2,PR,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},
+				#{Nation,jdbcType=INTEGER},#{Race,jdbcType=INTEGER},#{SpO2,jdbcType=INTEGER},
+				#{PR,jdbcType=INTEGER},#{CreateDate,jdbcType=TIMESTAMP},#{Version,jdbcType=TIMESTAMP},
+				#{DeviceSN,jdbcType=VARCHAR},#{SourceType,jdbcType=INTEGER},#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<!-- 新增血压数据 -->
+	<insert id="insertBpInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,LeftSys,LeftDia,PR,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},#{Nation,jdbcType=INTEGER},
+				#{Race,jdbcType=INTEGER},#{LeftSys,jdbcType=INTEGER},#{LeftDia,jdbcType=INTEGER},
+				#{PR,jdbcType=INTEGER},#{CreateDate,jdbcType=TIMESTAMP},#{Version,jdbcType=TIMESTAMP},
+				#{DeviceSN,jdbcType=VARCHAR},#{SourceType,jdbcType=INTEGER},#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<!-- 新增血糖数据 -->
+	<insert id="insertBsInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,BeforeMealFbg,AfterMealFbg,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},#{Nation,jdbcType=INTEGER},
+				#{Race,jdbcType=INTEGER},#{BeforeMealFbg,jdbcType=FLOAT},#{AfterMealFbg,jdbcType=FLOAT},
+				#{CreateDate,jdbcType=TIMESTAMP},#{Version,jdbcType=TIMESTAMP},
+				#{DeviceSN,jdbcType=VARCHAR},#{SourceType,jdbcType=INTEGER},#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<!-- 新增体温数据 -->
+	<insert id="insertTempInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,Temp,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},
+				#{Nation,jdbcType=INTEGER},#{Race,jdbcType=INTEGER},#{Temp,jdbcType=FLOAT},
+				#{CreateDate,jdbcType=TIMESTAMP},#{Version,jdbcType=TIMESTAMP},#{DeviceSN,jdbcType=VARCHAR},
+				#{SourceType,jdbcType=INTEGER},#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<!-- 新增尿常规数据 -->
+	<insert id="insertUrineInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,UrineNit,UrineLeu,UrineUbg,UrinePro,UrinePH,UrineBld,
+			UrineSG,UrineKet,UrineBil,UrineGlu,UrineVC,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},#{Nation,jdbcType=INTEGER},
+				#{Race,jdbcType=INTEGER},#{UrineNit,jdbcType=VARCHAR},#{UrineLeu,jdbcType=VARCHAR},
+				#{UrineUbg,jdbcType=VARCHAR},#{UrinePro,jdbcType=VARCHAR},#{UrinePH,jdbcType=VARCHAR},
+				#{UrineBld,jdbcType=VARCHAR},#{UrineSG,jdbcType=VARCHAR},#{UrineKet,jdbcType=VARCHAR},
+				#{UrineBil,jdbcType=VARCHAR},#{UrineGlu,jdbcType=VARCHAR},#{UrineVC,jdbcType=VARCHAR},
+				#{CreateDate,jdbcType=TIMESTAMP},#{Version,jdbcType=TIMESTAMP},#{DeviceSN,jdbcType=VARCHAR},
+				#{SourceType,jdbcType=INTEGER},#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<!-- 新增心电数据 -->
+	<insert id="insertEcgInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,HR,Ecg_Report,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},#{Nation,jdbcType=INTEGER},
+				#{Race,jdbcType=INTEGER},#{HR,jdbcType=INTEGER},#{EcgReport,jdbcType=VARCHAR},
+				#{CreateDate,jdbcType=TIMESTAMP},#{Version,jdbcType=TIMESTAMP},#{DeviceSN,jdbcType=VARCHAR},
+				#{SourceType,jdbcType=INTEGER},#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<!-- 新增心率数据 -->
+	<insert id="insertHrInfo" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		insert into report_healthmonitor
+			(Id,IdCode,PersonType,Nation,Race,HR,CreateDate,Version,DeviceSN,SourceType,IsSync)
+		values (#{Id,jdbcType=VARCHAR},#{IdCode,jdbcType=VARCHAR},#{PersonType,jdbcType=INTEGER},#{Nation,jdbcType=INTEGER},
+				#{Race,jdbcType=INTEGER},#{HR,jdbcType=INTEGER},#{CreateDate,jdbcType=TIMESTAMP},
+				#{Version,jdbcType=TIMESTAMP},#{DeviceSN,jdbcType=VARCHAR},#{SourceType,jdbcType=INTEGER},
+				#{IsSync,jdbcType=INTEGER})
+	
+	</insert>
+	
+	<update id="updateSihealDate" parameterType="com.boco.modules.fdoc.model.ReportHealthmonitorEntity">
+		update report_healthmonitor
+		<set>
+			<if test="IdCode != null and IdCode !=''">
+				IdCode=#{IdCode,jdbcType=VARCHAR},
+			</if>
+			<if test="SpO2 != null ">
+				SpO2=#{SpO2,jdbcType=INTEGER},
+			</if>
+			<if test="PR != null ">
+				PR=#{PR,jdbcType=INTEGER},
+			</if>
+			<if test="LeftSys != null">
+				LeftSys=#{LeftSys,jdbcType=INTEGER},
+			</if>
+			<if test="LeftDia != null">
+				LeftDia=#{LeftDia,jdbcType=INTEGER},
+			</if>
+			<if  test="BeforeMealFbg != null">
+				BeforeMealFbg=#{BeforeMealFbg,jdbcType=FLOAT},
+			</if>
+			<if  test="AfterMealFbg != null">
+				AfterMealFbg=#{AfterMealFbg,jdbcType=FLOAT},
+			</if>
+			<if test="Temp != null">
+				Temp=#{Temp,jdbcType=FLOAT},
+			</if>
+			<if test=" UrineNit != null and UrineNit !=''">
+				UrineNit=#{UrineNit,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineLeu != null and UrineLeu !=''">
+				UrineLeu=#{UrineLeu,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineUbg != null and UrineUbg !=''">
+				UrineUbg=#{UrineUbg,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrinePro != null and UrinePro !=''">
+				UrinePro=#{UrinePro,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrinePH != null and UrinePH !=''">
+				UrinePH=#{UrinePH,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineBld != null and UrineBld !=''">
+				UrineBld=#{UrineBld,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineSG != null and UrineSG !=''">
+				UrineSG=#{UrineSG,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineKet != null and UrineKet !=''">
+				UrineKet=#{UrineKet,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineBil != null and UrineBil !=''">
+				UrineBil=#{UrineBil,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineGlu != null and UrineGlu !=''">
+				UrineGlu=#{UrineGlu,jdbcType=VARCHAR},
+			</if>
+			<if test=" UrineVC != null and UrineVC !=''">
+				UrineVC=#{UrineVC,jdbcType=VARCHAR},
+			</if>
+			<if test=" EcgReport != null and EcgReport !=''">
+				Ecg_Report=#{EcgReport,jdbcType=VARCHAR},
+			</if>
+			<if test=" HR != null ">
+				HR=#{HR,jdbcType=INTEGER},
+			</if>
+			<if test="Version != null ">
+				Version=#{Version,jdbcType=TIMESTAMP}
+			</if>
+		</set>
+		where Id=#{Id,jdbcType=VARCHAR}
+	</update>
+</mapper>

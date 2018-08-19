@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.HypertensionRecordDao">
+	<sql id="Base_Column_List" >
+	   id, person_id, systolic_pressure, diastolic_pressure, detection_result, measuring_time, remarks
+	</sql>
+
+	<!-- 新增血压记录 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.HypertensionRecordEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into t_hypertension_record (person_id, systolic_pressure, 
+	      diastolic_pressure, detection_result, measuring_time, remarks
+	      )
+	    values (#{personId,jdbcType=VARCHAR}, #{systolicPressure,jdbcType=DOUBLE}, 
+	      #{diastolicPressure,jdbcType=DOUBLE}, #{detectionResult,jdbcType=VARCHAR}, #{measuringTime,jdbcType=TIMESTAMP},
+	      #{remarks,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 获取血压记录总数  -->
+	<select id="getRecordCount" parameterType="com.boco.modules.fdoc.vo.HypertensionRecordVo" resultType="integer">
+		SELECT
+			count(person_id)
+		FROM
+			t_hypertension_record
+		WHERE
+			person_id = #{personId}
+		<if test="detectionResults != null and detectionResults != ''">
+			AND detection_result IN (${detectionResults})
+		</if>
+	</select>
+	
+	<!-- 查询血压记录列表 -->
+	<select id="getRecordList" parameterType="string" resultType="com.boco.modules.fdoc.model.HypertensionRecordEntity">
+		select <include refid="Base_Column_List"/> from t_hypertension_record
+		WHERE person_id = #{0} order by measuring_time DESC
+	</select>
+	
+	<!-- 获取最近一条血压记录 -->
+	<select id="getLastRecord" parameterType="string" resultType="com.boco.modules.fdoc.model.HypertensionRecordEntity">
+		select <include refid="Base_Column_List"/> from t_hypertension_record
+		WHERE person_id = #{0} order by measuring_time DESC limit 1
+	</select>
+	
+	<!-- 获取某一天最后的一条记录  -->
+	<select id="getLastRecordInDay" parameterType="com.boco.modules.fdoc.vo.HypertensionRecordVo" resultType="com.boco.modules.fdoc.vo.HypertensionRecordVo">
+		SELECT
+			<include refid="Base_Column_List"/>
+		FROM
+			t_hypertension_record
+		WHERE
+			person_id = #{personId}
+		AND 
+			measuring_time &gt;= #{StartDate}
+		AND 
+			measuring_time &lt;= #{endDate}
+		ORDER BY 
+			measuring_time DESC
+		Limit 1
+	</select>
+	
+	<!-- 获取最近一条体征记录 -->
+	<select id="getLastAbnormalSignRecord" parameterType="string" resultType="map">
+		SELECT
+			person_id,
+			detection_result,
+			'1' AS exceptionType,
+			measuring_time
+		FROM
+			t_hypertension_record
+		WHERE
+				person_id = #{0}
+		UNION ALL
+			SELECT
+				person_id,
+				detection_result,
+				'2' AS exceptionType,
+				measuring_time
+			FROM
+				t_blood_suger_record
+			WHERE
+				person_id = #{0}
+			ORDER BY
+				measuring_time DESC
+			LIMIT 1
+	</select>
+</mapper>

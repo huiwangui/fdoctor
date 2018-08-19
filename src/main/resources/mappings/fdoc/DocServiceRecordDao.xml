@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.DocServiceRecordDao">
+	
+	<select id="getServicePackValue" parameterType="string" resultType="integer">
+		select service_pack_value from t_user_doc_sign
+		where person_id=#{0}
+	</select>
+	
+	<insert id="addRecord" parameterType="com.boco.modules.fdoc.model.DocServiceRecordEntity">
+		
+		insert into t_doc_service_record
+			(doctor_id,person_id,pack_id,details_id,mobile,service_address,remark,service_time,create_time,update_time)
+		values
+			(#{doctorId,jdbcType=VARCHAR},#{personId,jdbcType=VARCHAR},#{packId,jdbcType=INTEGER},
+			#{detailsId,jdbcType=INTEGER},#{mobile,jdbcType=VARCHAR},#{serviceAddress,jdbcType=VARCHAR},
+			#{remark,jdbcType=VARCHAR},#{serviceTime,jdbcType=TIMESTAMP},#{createTime,jdbcType=TIMESTAMP},
+			#{updateTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+	<select id="getRecordList"  parameterType="com.boco.modules.fdoc.vo.DocServiceRecordVo" resultType="com.boco.modules.fdoc.vo.DocServiceRecordVo">
+		select a.service_time,b.service_name,b.service_details
+		from t_doc_service_record a
+		left join t_servicepack_details b on a.details_id=b.id
+		where a.doctor_id=#{doctorId} and a.person_id=#{personId} and pack_id=#{packId}
+	</select>
+	
+	<select id="getRecordCount"  parameterType="com.boco.modules.fdoc.vo.DocServiceRecordVo" resultType="integer">
+		select count(1)
+		from t_doc_service_record a
+		left join t_servicepack_details b on a.details_id=b.id
+		where a.doctor_id=#{doctorId} and a.person_id=#{personId} and pack_id=#{packId}
+	</select>
+	
+	<select id="getUsedTimes"  parameterType="com.boco.modules.fdoc.model.DocServiceRecordEntity" resultType="integer">
+		select count(1)
+		from t_doc_service_record
+		where doctor_id=#{doctorId} and person_id=#{personId} and details_id=#{detailsId}
+	</select>
+	
+	<select id="getPackDetailsTimes"  parameterType="integer" resultType="integer">
+		select frequency
+		from t_servicepack_details
+		where  id=#{detailsId}
+	</select>
+</mapper>

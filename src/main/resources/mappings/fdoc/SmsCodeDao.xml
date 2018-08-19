@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.SmsCodeDao">
+
+	<sql id="smsCodeColumns">
+		mc.mobile,
+		mc.message,
+		mc.busi_type_id,
+		mc.id,
+		mc.busi_id,
+		mc.send_time,
+		mc.valid_date
+	</sql>
+
+
+	<!-- get sms code -->
+	<select id="validatePhoneCode" resultType="SmsCodeEntity">
+		SELECT
+		<include refid="smsCodeColumns" />
+		FROM
+		t_sms_code AS mc
+		WHERE
+		mc.mobile = #{mobile}
+		AND mc.message = #{code}
+		AND mc.busi_type_id = #{busiTypeId}
+		AND mc.valid_date = NULL
+		ORDER BY
+		mc.send_time DESC
+	</select>
+
+	<!-- get sms code -->
+	<select id="findList" resultType="SmsCodeEntity">
+		SELECT
+		<include refid="smsCodeColumns" />
+		FROM
+		t_sms_code AS mc
+		WHERE
+		mc.busi_type_id = #{busiTypeId}
+		AND
+		mc.valid_date = NULL
+		ORDER BY
+		mc.send_time DESC
+	</select>
+
+	<!-- insert sms code -->
+	<insert id="insert" parameterType="SmsCodeEntity">
+		INSERT INTO t_sms_code mc(
+		mc.busi_id,
+		mc.busi_type_id,
+		mc.mobile,
+		mc.mesage,
+		mc.send_time
+		) VALUES (
+		#{busiId},
+		#{busiTypeId},
+		#{mobile},
+		#{message},
+		#{sendTime}
+		)
+	</insert>
+
+	<!-- update sms code`s validDate -->
+	<update id="update" parameterType="SmsCodeEntity">
+		UPDATE t_sms_code SET
+		valid_date #{validDate}
+		WHERE id = #{id}
+	</update>
+
+
+	<!-- 物理删除用户 -->
+	<update id="delete">
+		DELETE FROM t_sms_code
+		WHERE id = #{0}
+	</update>
+
+</mapper>

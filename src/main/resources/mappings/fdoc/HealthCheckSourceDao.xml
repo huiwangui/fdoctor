@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.HealthCheckSourceDao">
+
+	<!-- 通过医生、日期、体检类型获取列表（用于判断当天是否已有该医生放的号） -->
+	<select id="getSourceByDocAndDate" resultType="com.boco.modules.fdoc.model.HealthCheckSourceEntity" parameterType="com.boco.modules.fdoc.vo.HealthCheckSourceVo">
+		select id,pay_type,check_type,check_date,doc_id,source_num,create_time,version,`status`,del_flag from t_healthcheck_source
+		where pay_type=#{payType} and check_type=#{checkType} and doc_id=#{docId} and check_date=#{checkDate} and del_flag=0
+	</select>
+	
+	<!-- 修改号源数量 -->
+	<update id="updateSourceNum" parameterType="com.boco.modules.fdoc.model.HealthCheckSourceEntity">
+		update t_healthcheck_source set source_num=#{sourceNum}  
+		where pay_type=#{payType} and check_type=#{checkType} and doc_id=#{docId} and check_date=#{checkDate} and del_flag=0
+	</update>
+	
+	<!-- 新增放号记录 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.HealthCheckSourceEntity">
+		insert into t_healthcheck_source (pay_type,check_type,check_date,doc_id,source_num,create_time,version,`status`,del_flag)
+		values(#{payType},#{checkType},#{checkDate},#{docId},#{sourceNum},#{createTime},#{version},#{status},#{delFlag})
+	</insert>
+	
+	<!-- 根据状态查询该医生已发布、已过期的号源信息 -->
+	<select id="getByStatus" parameterType="com.boco.modules.fdoc.vo.HealthCheckSourceVo" resultType="com.boco.modules.fdoc.vo.HealthCheckSourceVo">
+		select a.id,a.pay_type,a.check_type,a.check_date,a.doc_id,a.source_num,a.`status`,
+		c.`name` hospName,UNIX_TIMESTAMP(a.check_date)*1000 timeStamp
+		from t_healthcheck_source a left join t_doctor b on a.doc_id=b.id
+		left join t_hospital c on b.hosp_id=c.id
+		where a.check_type=#{checkType} and a.status=#{status} and a.del_flag=0 and b.doc_uid=#{docUid}
+		order by a.check_date desc
+	</select>
+	
+	<!-- 清空已过期的号源信息 -->
+	<update id="clear" parameterType="com.boco.modules.fdoc.model.HealthCheckSourceEntity">
+		update t_healthcheck_source set del_flag=1 where check_type=#{checkType} and doc_id=#{docId} and status=2
+	</update>
+	
+	<!-- 查询可预约的记录 -->
+	<select id="getBookingHealthCheck" parameterType="com.boco.modules.fdoc.vo.HealthCheckSourceVo" resultType="com.boco.modules.fdoc.vo.HealthCheckSourceVo">
+		select a.id,a.pay_type,a.check_type,a.doc_id,a.source_num,a.`status`,
+		c.`name` hospName,UNIX_TIMESTAMP(a.check_date)*1000 timeStamp,c.id hospId
+		from t_healthcheck_source a left join t_doctor b on a.doc_id=b.id
+		left join t_hospital c on b.hosp_id=c.id
+		where a.check_type=#{checkType} and a.status=#{status} and a.del_flag=0 and a.check_date between curdate() and #{endDate} 
+		order by a.check_date
+	</select>
+	
+	<!-- 根据id获取对象 -->
+	<select id="get" parameterType="string" resultType="com.boco.modules.fdoc.model.HealthCheckSourceEntity">
+		select id,pay_type,check_type,check_date,doc_id,source_num,create_time,version,status,del_flag from t_healthcheck_source
+		where id=#{id} and del_flag=0
+	</select>
+	
+	<update id="update" parameterType="com.boco.modules.fdoc.model.HealthCheckSourceEntity">
+		update t_healthcheck_source set source_num=#{sourceNum},version=version+1 where id=#{id} and version=#{version} 
+	</update>
+</mapper>

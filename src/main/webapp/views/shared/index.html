@@ -1,0 +1,70 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>家庭医生工作管理系统</title>
+    <link href="../../statics/css/style.css" rel="stylesheet" type="text/css" />
+	<link href="../../statics/css/index.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../../statics/js/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="../../statics/js/index.js"></script>
+</head>
+<body bgcolor="#F5F5F5">
+
+	<div class="home-bg">
+		<div class="h-top">
+			<div class="h-logo g-left">
+				<a href="javascript:;" title="类乌齐县牧民医疗管理系统"></a>
+			</div>
+			<div class="user-nav g-right">
+				<label class="admin-ico"><span>${user_session_infos.userInfo.userRealName}</span></label>
+				<label class="back-ico"><a href="${pageContext.request.contextPath}/WEB-PAGES/login/contents.jsp" target="content">返回首页</a></label>
+				<label class="repwd-ico"><a href="${pageContext.request.contextPath}/WEB-PAGES/sys_mgmt/modifypassword.jsp" target="content">修改密码</a></label>
+				<label class="off-ico"><a href="${pageContext.request.contextPath}/loginout.do" onclick="return aa()" target="_parent" class="a1">退出系统</a></label>
+			</div>
+		</div>	
+		<div class="h-content">
+			<!-- 左边导航 -->
+			<div class="left-menu g-left">
+				<!-- 用户头像信息&模拟操作台 -->
+				<div class="wrap">
+					<div class="bordure doc-tab">
+						<div class="wrap" style="text-align:center">
+							<div class="doc-head"></div>
+						</div>
+						<div class="wrap">
+							<ul>
+								<li><a href=""></a></li>
+								<li><a href=""></a></li>
+								<li><a href=""></a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<ul class="nav-menu">
+					<li class="">
+						<a>${subsystem.name}</a><span class="down-ico"></span>
+						<ul class="menu-l2">
+						<li><i class="down-ico"></i><a target="content" href="${pageContext.request.contextPath}${module.url}">
+						</ul>
+					</li>
+				</ul>	
+				<div style="display: block;font-size:12px;width:300;text-align:justify;
+      text-justify:distribute-all-lines;/*ie6-8*/
+      text-align-last:justify;/* ie9*/
+      -moz-text-align-last:justify;/*ff*/
+      -webkit-text-align-last:justify;/*chrome 20+*/">打发士大夫撒上</div>	
+			</div>	
+
+			<!-- iframe动态页面区域 -->
+			<div class="content">
+				<iframe name="content" id="maincontent1" class="myframe" src="../shared/content.html" frameborder="0" scrolling="no" onload="Javascript:SetCwinHeight()">
+				</iframe>
+			</div>	
+		</div>
+	
+	</div>
+
+
+</body>
+</html>

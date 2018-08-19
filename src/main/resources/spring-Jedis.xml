@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+	default-lazy-init="true">
+
+	<description>Jedis Configuration</description>
+
+	<!-- 加载配置属性文件 -->
+	<context:property-placeholder
+		ignore-unresolvable="true" location="classpath:api.properties" />
+
+	<bean id="jedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+		<property name="maxIdle" value="${redis.maxIdle}" /> <!-- 最大能够保持idel状态的对象数 -->
+		<property name="maxTotal" value="50000" /> <!-- 最大分配的对象数 -->
+		<property name="testOnBorrow" value="${redis.testOnBorrow}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="minIdle" value="${redis.minIdle}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="maxWaitMillis" value="${redis.maxWaitMillis}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="testWhileIdle" value="${redis.testWhileIdle}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${redis.timeBetweenEvictionRunsMillis}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="numTestsPerEvictionRun" value="${redis.numTestsPerEvictionRun}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+		<property name="minEvictableIdleTimeMillis" value="${redis.minEvictableIdleTimeMillis}" /> <!-- 当调用borrow Object方法时，是否进行有效性检查 -->
+	</bean>
+
+	<bean id="jedisPool" class="redis.clients.jedis.JedisPool">
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+		<constructor-arg index="1" value="${redis.host}" type="java.lang.String" />
+		<constructor-arg index="2" value="${redis.port}" type="int" />
+	</bean>
+
+</beans>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.VaccineDao">
+	
+	<select id="getVaccineDetail" resultType="com.boco.modules.fdoc.vo.VaccienDetailVo">
+		select a.id detailId,b.name,a.type,a.dose,a.optimal_time,a.sort_code ,a.vaccine_id from
+		t_vaccine_detail a left join t_vaccine b on a.vaccine_id=b.id
+		order by a.sort_code
+	</select>
+	<select id="getEntityByDetail" resultType="com.boco.modules.fdoc.model.VaccineEntity" parameterType="integer">
+		select a.id,a.name,a.type_name,a.unit,a.approva_number,a.money,a.create_time,a.update_time
+		from t_vaccine a left join t_vaccine_detail b on a.id=b.vaccine_id
+		where b.id=#{ditailId}
+	</select>
+</mapper>

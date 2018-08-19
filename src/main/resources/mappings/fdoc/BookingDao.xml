@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.BookingDao">
+	<sql id="bookingColumns">
+		b.patient_id,
+		b.period,
+		b.order_num,
+		b.sche_id,
+		b.seq,
+		b.provider_num,
+		b.staff_num,
+		b.get_ticket_num,
+		b.card_type,
+		b.card_num,
+		b.patient_card_num,
+		b.pay_method,
+		b.pay_status,
+		b.see_doc_Status
+	</sql>
+	<!-- 预约挂号 -->
+	<!-- INSERT INTO t_booking(
+		<include refid="bookingColumns" />
+		)
+		VALUES (
+		#{patientId},
+		#{period},
+		#{scheId},
+		#{seq},
+		#{providerNum},
+		#{staffNum},
+		#{getTicketNum},
+		#{cardType},
+		#{cardNum},
+		#{patientCardNum},
+		#{payMethod},
+		#{payStatus},
+		#{refundStatus},
+		#{cancelStatus}
+		) -->
+	<insert id="booking" parameterType="BookingEntity" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO t_booking(
+		 order_num,
+		 patient_id,
+		 period,
+		 sche_id,
+		 seq,
+		 provider_num,
+		 staff_num,
+		 get_ticket_num,
+		 card_type,
+		 card_num,
+		 patient_card_num,
+		 pay_method,
+		 pay_status,
+		 see_doc_Status,
+		 create_time
+		)VALUES(
+		#{orderNum},
+		#{patientId},
+		#{period},
+		#{scheId},
+		#{seq},
+		#{providerNum},
+		#{staffNum},
+		#{getTicketNum},
+		#{cardType},
+		#{cardNum},
+		#{patientCardNum},
+		#{payMethod},
+		#{payStatus},
+		#{seeDocStatus},
+		#{createTime}
+		)
+	</insert>
+	<!-- 取消预约（已付款） -->
+	<update id="cancelPaidBooking" parameterType="int">
+		UPDATE t_booking b
+		SET pay_status='2',see_doc_Status='3'
+		WHERE id=#{id}
+	</update>
+	<!-- 取消预约（未付款） -->
+	<update id="cancelUnpaidBooking" parameterType="int">
+		UPDATE t_booking
+		SET pay_status='4',see_doc_Status='3'
+		WHERE id=#{id}
+	</update>
+	<!-- 查询预约 -->
+	<select id="getBooking" parameterType="com.boco.modules.fdoc.vo.BookingVo" resultType="com.boco.modules.fdoc.vo.BookingVo">
+		select a.id,a.order_num,b.`name`,d.id docId,d.`name` docName,f.id hospId,e.`name` deptName,d.title,f.`name` hospName,
+		UNIX_TIMESTAMP(c.work_time) work_time,a.period,a.pay_status,a.see_doc_Status from 
+		t_booking a left join t_user_relations b on a.patient_id=b.id
+		left join t_schedule c on a.sche_id=c.id
+		left join t_doctor d on c.doc_id=d.id
+		left join t_department e on d.dept_id=e.id
+		left join t_hospital f on d.hosp_id=f.id
+		where b.uid=#{uid}
+		<if test="seeDocStatus != null and seeDocStatus != '' and seeDocStatus != 0">
+			and a.pay_status in (${payStatus})
+		</if>
+		order by c.work_time desc
+	</select>
+	<!-- 退款 -->
+	<update id="getRefund" parameterType="int">
+		UPDATE t_booking 
+		SET pay_status='2'
+		WHERE id=#{id}
+	</update>
+	
+	<select id="getCountByDocId" parameterType="integer" resultType="integer">
+		select count(a.id)
+			 from t_booking a left join t_schedule b on a.sche_id=b.id
+			where b.doc_id=#{docId}
+	</select>
+	<update id="updateOrderNum" parameterType="BookingEntity">
+		UPDATE t_booking b
+		SET order_num=#{orderNum}
+		WHERE id=#{id}
+	</update>
+	<select id="getBookingNum" resultType="integer" parameterType="BookingEntity">
+		select count(id)
+		from t_booking where patient_id=#{patientId} and period=#{period} and sche_id=#{scheId} and see_doc_status!=3
+	</select>
+	<update id="updateStatus"  parameterType="BookingEntity">
+		update t_booking set pay_status=#{payStatus},see_doc_Status=#{seeDocStatus} where id=#{id}
+	</update>
+</mapper>

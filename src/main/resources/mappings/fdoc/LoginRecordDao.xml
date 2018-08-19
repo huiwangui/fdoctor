@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.LoginRecordDao">
+	
+	<insert id="insertLoginRecord" parameterType="com.boco.modules.fdoc.model.LoginRecordEntity">
+		insert into t_login_record(login_type,login_account,brand_model,phone_type,version,imei,login_time)
+		values (#{loginType,jdbcType=INTEGER},#{loginAccount,jdbcType=VARCHAR},
+				#{brandModel,jdbcType=VARCHAR},#{phoneType,jdbcType=INTEGER},
+				#{version,jdbcType=VARCHAR},#{imei,jdbcType=VARCHAR},#{loginTime,jdbcType=TIMESTAMP})
+	</insert>
+	
+</mapper>

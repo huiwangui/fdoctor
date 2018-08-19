@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.ChineseMedicineFollowUpDao">
+	<sql id="adColumns">
+		id, person_id, way_up, doctor_id, follow_up_date, next_follow_up_date, create_time, 
+	    update_time, update_id, answers, moderate_quality, moderate_quality_score, quality_deficiency, 
+	    quality_deficiency_score, yang_quality, yang_quality_score, yin_quality, yin_quality_score, 
+	    phlegm, phlegm_score, damp_heat, damp_heat_score, blood_quality, blood_quality_score, 
+	    qi_quality, qi_quality_score, tebingquality, tebingquality_score, other_suggestions
+	</sql>
+	
+	<!-- 新增中医随访 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.ChineseMedicineFollowUpEntity" >
+	    insert into t_chinese_medicine_follow_up (id, person_id, way_up, 
+	      doctor_id, follow_up_date, next_follow_up_date, 
+	      create_time, update_time, update_id, 
+	      answers, moderate_quality, moderate_quality_score, 
+	      quality_deficiency, quality_deficiency_score, 
+	      yang_quality, yang_quality_score, yin_quality, 
+	      yin_quality_score, phlegm, phlegm_score, 
+	      damp_heat, damp_heat_score, blood_quality, 
+	      blood_quality_score, qi_quality, qi_quality_score, 
+	      tebingquality, tebingquality_score, other_suggestions
+	      )
+	    values (#{id,jdbcType=VARCHAR}, #{personId,jdbcType=VARCHAR}, #{wayUp,jdbcType=VARCHAR}, 
+	      #{doctorId,jdbcType=VARCHAR}, #{followUpDate,jdbcType=DATE}, #{nextFollowUpDate,jdbcType=DATE}, 
+	      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{updateId,jdbcType=VARCHAR}, 
+	      #{answers,jdbcType=VARCHAR}, #{moderateQuality,jdbcType=VARCHAR}, #{moderateQualityScore,jdbcType=INTEGER}, 
+	      #{qualityDeficiency,jdbcType=VARCHAR}, #{qualityDeficiencyScore,jdbcType=INTEGER}, 
+	      #{yangQuality,jdbcType=VARCHAR}, #{yangQualityScore,jdbcType=INTEGER}, #{yinQuality,jdbcType=VARCHAR}, 
+	      #{yinQualityScore,jdbcType=INTEGER}, #{phlegm,jdbcType=VARCHAR}, #{phlegmScore,jdbcType=INTEGER}, 
+	      #{dampHeat,jdbcType=VARCHAR}, #{dampHeatScore,jdbcType=INTEGER}, #{bloodQuality,jdbcType=VARCHAR}, 
+	      #{bloodQualityScore,jdbcType=INTEGER}, #{qiQuality,jdbcType=VARCHAR}, #{qiQualityScore,jdbcType=INTEGER}, 
+	      #{tebingquality,jdbcType=VARCHAR}, #{tebingqualityScore,jdbcType=INTEGER}, #{otherSuggestions,jdbcType=LONGVARCHAR}
+	      )
+  </insert>
+  
+  <!-- 修改中医随访 -->
+  <update id="update" parameterType="com.boco.modules.fdoc.model.ChineseMedicineFollowUpEntity">
+		update t_chinese_medicine_follow_up
+		 set person_id = #{personId,jdbcType=VARCHAR},
+		   way_up = #{wayUp,jdbcType=VARCHAR},
+<!-- 		   doctor_id = #{doctorId,jdbcType=VARCHAR}, -->
+		   follow_up_date = #{followUpDate,jdbcType=DATE},
+		   next_follow_up_date = #{nextFollowUpDate,jdbcType=DATE},
+<!-- 		   create_time = #{createTime,jdbcType=TIMESTAMP}, -->
+		   update_time = #{updateTime,jdbcType=TIMESTAMP},
+		   update_id = #{updateId,jdbcType=VARCHAR},
+		   answers = #{answers,jdbcType=VARCHAR},
+		   moderate_quality = #{moderateQuality,jdbcType=VARCHAR},
+		   moderate_quality_score = #{moderateQualityScore,jdbcType=INTEGER},
+		   quality_deficiency = #{qualityDeficiency,jdbcType=VARCHAR},
+		   quality_deficiency_score = #{qualityDeficiencyScore,jdbcType=INTEGER},
+		   yang_quality = #{yangQuality,jdbcType=VARCHAR},
+		   yang_quality_score = #{yangQualityScore,jdbcType=INTEGER},
+		   yin_quality = #{yinQuality,jdbcType=VARCHAR},
+		   yin_quality_score = #{yinQualityScore,jdbcType=INTEGER},
+		   phlegm = #{phlegm,jdbcType=VARCHAR},
+		   phlegm_score = #{phlegmScore,jdbcType=INTEGER},
+		   damp_heat = #{dampHeat,jdbcType=VARCHAR},
+		   damp_heat_score = #{dampHeatScore,jdbcType=INTEGER},
+		   blood_quality = #{bloodQuality,jdbcType=VARCHAR},
+		   blood_quality_score = #{bloodQualityScore,jdbcType=INTEGER},
+		   qi_quality = #{qiQuality,jdbcType=VARCHAR},
+		   qi_quality_score = #{qiQualityScore,jdbcType=INTEGER},
+		   tebingquality = #{tebingquality,jdbcType=VARCHAR},
+		   tebingquality_score = #{tebingqualityScore,jdbcType=INTEGER},
+		   other_suggestions = #{otherSuggestions, jdbcType=INTEGER}
+		 where id = #{id,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 获取中医随访列表 -->
+  <select id="getChsConsList" parameterType="com.boco.modules.fdoc.vo.ChineseMedicineFollowUpVo" resultType="com.boco.modules.fdoc.vo.ChineseMedicineFollowUpVo">
+		SELECT
+			a.*, b.person_name,
+			b.phone_number mobile,
+			b.id_card,
+			b.sex
+		FROM
+			t_chinese_medicine_follow_up a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		<where>
+			<if test="personName != null and personName != ''">
+				b.person_name LIKE CONCAT('%',#{personName},'%')
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND b.id_card = #{idCard}
+			</if>
+		</where>
+  </select>
+  
+  <!-- 获取中医随访总数 -->
+  <select id="getChsConsCount" parameterType="com.boco.modules.fdoc.vo.ChineseMedicineFollowUpVo" resultType="integer">
+  		SELECT
+			COUNT(a.id)
+		FROM
+			t_chinese_medicine_follow_up a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		<where>
+			<if test="personName != null and personName != ''">
+				b.person_name LIKE CONCAT('%',#{personName},'%')
+			</if>
+			<if test="idCard != null and idCard != ''">
+				AND b.id_card = #{idCard}
+			</if>
+		</where>
+  </select>
+  
+  <!-- 获取中医随访详情 -->
+  <select id="getChsConsInfo" parameterType="string" resultType="com.boco.modules.fdoc.model.ChineseMedicineFollowUpEntity">
+  		select <include refid="adColumns"/> from t_chinese_medicine_follow_up
+  		where id = #{0}
+  </select>
+  
+  <!-- 获取最后修改的随访信息 -->
+  <select id="getLastChsCons" resultType="com.boco.modules.fdoc.vo.ChineseMedicineFollowUpVo">
+  		SELECT
+			a.*, b.person_name,
+			b.phone_number mobile,
+			b.id_card,
+			c.doc_name updateName
+		FROM
+			t_chinese_medicine_follow_up a
+		LEFT JOIN t_person_information b ON a.person_id = b.person_id
+		LEFT JOIN t_doctor c ON a.update_id = c.id
+		ORDER BY
+			a.update_time DESC
+		LIMIT 1
+  </select>
+	
+</mapper>

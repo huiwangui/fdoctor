@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.DoctorUserDao">
+	<sql id="Base_Column_List" >
+    	doctor_user_id, user_name, password, nick_name, img, product_code, doctor_id, create_time, update_time
+  	</sql>
+  	
+  	<!-- 登录验证 -->
+  	<select id="verifyUser" parameterType="com.boco.modules.fdoc.model.DoctorUserEntity" resultType="com.boco.modules.fdoc.model.DoctorUserEntity">
+  		select <include refid="Base_Column_List"/> from t_doctor_user
+  		where user_name = #{userName} and password = #{password}
+  	</select>
+  	
+  	<!-- 根据用户名查找用户 -->
+  	<select id="getUserByUsername" parameterType="string" resultType="com.boco.modules.fdoc.model.DoctorUserEntity">
+  		select <include refid="Base_Column_List"/> from t_doctor_user
+  		where user_name = #{userName}
+  	</select>
+  	
+  	<!-- 修改医生登录账号信息 -->
+  	<update id="update" parameterType="com.boco.modules.fdoc.model.DoctorUserEntity" >
+	    update t_doctor_user
+	    <set >
+	      <if test="userName != null" >
+	        user_name = #{userName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="password != null" >
+	        password = #{password,jdbcType=VARCHAR},
+	      </if>
+	      <if test="nickName != null" >
+	        nick_name = #{nickName,jdbcType=VARCHAR},
+	      </if>
+	      <if test="img != null" >
+	        img = #{img,jdbcType=VARCHAR},
+	      </if>
+	      <if test="productCode != null" >
+	        product_code = #{productCode,jdbcType=VARCHAR},
+	      </if>
+	      <if test="doctorId != null" >
+	        doctor_id = #{doctorId,jdbcType=VARCHAR},
+	      </if>
+	      <if test="createTime != null" >
+	        create_time = #{createTime,jdbcType=TIMESTAMP},
+	      </if>
+	      <if test="updateTime != null" >
+	        update_time = #{updateTime,jdbcType=TIMESTAMP},
+	      </if>
+	    </set>
+	    where user_name = #{userName,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 通过用户名获取医生 -->
+  <select id="getDoctorByUsername" parameterType="string" resultType="com.boco.modules.fdoc.vo.DoctorDetailVo">
+  	SELECT
+		a.id,
+		a.doc_name,
+		a.sex,
+		a.dept_name,
+		a.org_id,
+		a.region_code,
+		a.phone_number,
+		a.specialty,
+		a.introduction,
+		a.team_id,
+		a.doc_type,
+		b.doctor_user_id,
+		b.img,
+		b.user_name,
+		b.password,
+		b.nick_name,
+		b.product_code,
+		c.org_name,
+		c.address orgAddress
+	FROM
+		t_doctor a
+	LEFT JOIN t_doctor_user b ON a.id = b.doctor_id
+	LEFT JOIN t_hospital c ON a.org_id = c.id
+	WHERE
+		b.user_name = #{0}
+  </select>
+  
+  <!-- 获取医生团队账号列表，用于推送 -->
+  <select id="getAccountsByTeamId" parameterType="string" resultType="string">
+  	SELECT
+		a.user_name
+	FROM
+		t_doctor_user a
+	LEFT JOIN t_doctor b ON a.doctor_id = b.id
+	WHERE
+		b.team_id = #{0}
+  </select>
+  
+  <!-- 根据用户号获取其团队号 -->
+  <select id="getTeamidByUsername" parameterType="string" resultType="string">
+  	SELECT
+		b.team_id
+	FROM
+		t_doctor_user a
+	LEFT JOIN t_doctor b ON a.doctor_id = b.id
+	WHERE
+		a.user_name=#{userName}
+  </select>
+</mapper>

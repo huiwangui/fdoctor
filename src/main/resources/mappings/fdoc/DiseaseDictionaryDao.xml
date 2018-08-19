@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.DiseaseDictionaryDao">
+
+	<!-- 查询所有疾病字典项 -->
+	<select id="getAllDictionary" resultType="com.boco.modules.fdoc.model.DiseaseDictionaryEntity">
+		SELECT
+			id,
+			disease_id,
+			disease_code,
+			disease_name
+		FROM
+			t_disease_dictionary
+	</select>
+	
+	<!-- 通过ID查询疾病字典项 -->
+	<select id="getDictionaryById" parameterType="string" resultType="com.boco.modules.fdoc.model.DiseaseDictionaryEntity">
+		SELECT
+			id,
+			disease_id,
+			disease_code,
+			disease_name
+		FROM
+			t_disease_dictionary
+		WHERE
+			disease_id = #{0}
+	</select>
+</mapper>

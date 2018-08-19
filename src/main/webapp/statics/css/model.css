@@ -1,0 +1,19 @@
+.v-model{
+	display: none;
+	width: ;
+	height:;
+	position: fixed;
+}
+.v-model>div{
+	padding: 1rem;	
+}
+.v-model .vtop-bar:after{
+	content:'';
+	box-sizing: border-box;
+}
+.v-model .vtop-bar{
+	background-color:#058FCA; 
+}
+.v-model .v-body{
+	
+}

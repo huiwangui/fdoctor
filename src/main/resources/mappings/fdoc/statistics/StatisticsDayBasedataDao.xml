@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.statistics.StatisticsDayBasedataDao">
+	<sql id="Base_Column_List" >
+		id, person_count, sign_count, hyper_count, diabetes_count, children_count, major_psychosis_count, 
+		org_count, team_count,statistics_date, create_time,family_count
+	</sql>
+	
+	<!-- 获取最近一条统计信息 -->
+	<select id="getLastInfo" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayBasedataEntity">
+		select <include refid="Base_Column_List"/> from t_statistics_day_basedata
+		order by statistics_date desc limit 1
+	</select>
+	
+	<!-- 通过统计日期获取统计信息 -->
+	<select id="getLastInfoByDate" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayBasedataEntity" parameterType="java.util.Date">
+		select <include refid="Base_Column_List"/> from t_statistics_day_basedata
+		where statistics_date = #{0}
+	</select>
+	
+	<!-- 手动调用存储过程 -->
+	<select id="callStatisticsProcedure">
+		call procedure_basedata_statistics()
+	</select>
+
+
+	<!-- 手动调用存储过程 大屏的存储过程-->
+	<select id="callDayTwoBasedataProcedure">
+		call procedure_basedata_statistics_day_two()
+	</select>
+
+
+	<select id="callDayTwoTeamBasedataTeamProcedure">
+		call procedure_basedata_statistics_day_two_team()
+	</select>
+
+	<select id="getStatisticDayTwoBasedata" resultType="com.boco.modules.fdoc.model.statistics.StatisticsDayTwoBasedataEntity">
+
+		<if test="teamId!=null and teamId!='' and type!=null and type!=''" >
+			select
+			 hyper_count,
+			 dabetes_count,
+			 child_count,
+			 cj_count,
+			 old_man_count,
+			profile_count,
+			 health_asse_count,
+			interro_count,
+			 health_edu_count,
+			 hyper_person_desease_total,
+			hyper_person_desease_estimatel,
+			 person_over_eighteen,
+			 latest_hyper_normal_count,
+			 dabetes_person_desease_total,
+			/*sum(dabetes_person_desease_estimatel) */dabetes_person_desease_estimatel,
+			latest_dabetes_normal_count,
+			 other_examin_count
+			from t_statistics_day_two_basedata t
+			where
+			1=1
+			and t.team_id = #{teamId} and t.type = #{type}
+		</if>
+
+		<if test="orgId!=null and orgId!='' and type!=null and type!=''">
+			select
+			sum(hyper_count) hyper_count,
+			sum(dabetes_count) dabetes_count,
+			sum(child_count) child_count,
+			sum(cj_count) cj_count,
+			sum(old_man_count) old_man_count,
+			sum(profile_count) profile_count,
+			sum(health_asse_count) health_asse_count,
+			sum(interro_count) interro_count,
+			sum(health_edu_count) health_edu_count,
+			sum(hyper_person_desease_total) hyper_person_desease_total,
+			hyper_person_desease_estimatel,
+			sum(person_over_eighteen) person_over_eighteen,
+			sum(latest_hyper_normal_count) latest_hyper_normal_count,
+			sum(dabetes_person_desease_total) dabetes_person_desease_total,
+			/*sum(dabetes_person_desease_estimatel) */dabetes_person_desease_estimatel,
+			sum(latest_dabetes_normal_count) latest_dabetes_normal_count,
+			sum(other_examin_count) other_examin_count
+			from t_statistics_day_two_basedata t
+			where
+			1=1
+			and t.org_id = #{orgId} and t.type = #{type}
+		</if>
+
+		<if test="(teamId==null or teamId=='') and (orgId==null or orgId=='') and type!=null and type!=''">
+			select * from t_statistics_day_two_basedata t
+			where
+			1=1 and t.type = #{type}
+		</if>
+
+		and DATE_FORMAT(now(),"%Y-%M-%D") = DATE_FORMAT(t.create_time,"%Y-%M-%D")
+	</select>
+</mapper>

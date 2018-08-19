@@ -1,0 +1,33 @@
+/*********body基础样式********/
+body {
+	background: url(../../statics/image/bg.png) no-repeat fixed;
+	background-size: 100% 100%;
+}
+
+.mainSection {
+	width: 1400px;
+	margin: 0 auto;
+	font-size: 1.4rem;
+}
+
+.g-mainContent {
+	width: 1180px;
+	margin-left: 210px;
+}
+
+@media screen and (max-width:1366px) {
+	.nav, .mainSection {
+		width: 1100px;
+	}
+	.g-mainContent {
+		width: 910px;
+		margin-left: 180px;
+	}
+}
+
+.column {
+	width: 100%;
+	margin-bottom: 0.4rem;
+	position: relative;
+}
+

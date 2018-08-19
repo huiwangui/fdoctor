@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.CommentDao">
+	<sql id="comColumns">
+		id ,
+		article_id,
+		commenter_id,
+		comment_time,
+		comment
+	</sql>
+	<!-- 获取评论列表 -->
+	<select	id="selectCommentList" parameterType="com.boco.modules.fdoc.vo.ArticleVo"   resultType="com.boco.modules.fdoc.vo.ArticleVo">
+		SELECT 
+		<include refid="comColumns"/>
+		FROM t_comment	where article_id=#{articleId} order by  comment_time DESC
+	</select>
+	
+	<select	id="getCommentCount" parameterType="com.boco.modules.fdoc.vo.ArticleVo"   resultType="int">
+		SELECT 
+		count(1)
+		FROM t_comment	where article_id=#{articleId} 
+	</select>
+	<select	id="selectNameImg" parameterType="String"   resultType="com.boco.modules.fdoc.vo.ArticleVo">
+			SELECT
+				*
+			FROM
+				(
+					SELECT
+						nickname,img as userImg
+					FROM
+						t_user
+					WHERE
+						person_id = #{0}
+				) AS t1
+			UNION ALL
+				SELECT
+					*
+				FROM
+					(
+						SELECT
+							(
+								SELECT
+									doc_name
+								FROM
+									t_doctor
+								WHERE
+									id =#{0}
+							) as name,
+							img
+						FROM
+							t_doctor_user
+						WHERE
+							doctor_id =#{0}
+					) AS t2
+	</select>
+	<insert id="insertOneComment" parameterType="com.boco.modules.fdoc.model.CommentEntity" useGeneratedKeys="true"  keyProperty="id" >
+	    insert into t_comment (
+		article_id,
+		commenter_id,
+		comment_time,
+		comment
+		)values(
+		#{articleId},#{commenterId},#{commentTime},#{comment}
+		)
+	</insert>
+</mapper>

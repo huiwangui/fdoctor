@@ -1,0 +1,38 @@
+/*********顶部基础样式*********/
+.top-bar{
+	background-image:url(../../statics/image/img_top.png);
+	padding:0.3rem 0;
+	margin-bottom: 0 rem;
+}
+.nav{
+	width: 1400px;
+	margin: 0 auto;
+	overflow: hidden;
+}
+.nav-logo{
+	background-image:url(../../statics/image/logo2.png);
+	width: 270px;
+	height:65px;
+}
+.login-box{
+	margin-top: 4rem;
+}
+.login-box a{
+	display: inline-block; 
+	font-size: 1.7rem;
+	color: white;
+	margin-right: 2rem;
+	padding-left:2rem; 
+	background-image: url(../../statics/image/icon/icon_com.png);
+	background-repeat: no-repeat;
+	background-position: 0 0;
+}
+.login-box a.userName{
+	background-position: 0 -29px;
+}
+.login-box a.logOut{
+	background-position: 0 -60px;
+}
+.login-box a:hover{
+	text-decoration: underline;
+}

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.boco.modules.fdoc.dao.UserRealtionDao" >
+  <resultMap id="BaseResultMap" type="com.boco.modules.fdoc.model.UserRealtion" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="person_id" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="user_uid" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="relation" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    id, person_id, user_uid, relation
+  </sql>
+  
+ 
+  <select id="selectRelations" resultType="com.boco.modules.fdoc.model.UserRealtion" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_user_relation
+    where user_uid = #{0}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_user_relation
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insert" parameterType="com.boco.modules.fdoc.model.UserRealtion" >
+    insert into t_user_relation (person_id, user_uid, 
+      relation)
+    values (#{personId,jdbcType=VARCHAR}, #{userUid,jdbcType=VARCHAR}, 
+      #{relation,jdbcType=VARCHAR})
+  </insert>
+  
+  
+  
+  
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.boco.modules.fdoc.model.UserRealtion" >
+    update t_user_relation
+    <set >
+      <if test="personId != null" >
+        person_id = #{personId,jdbcType=VARCHAR},
+      </if>
+      <if test="userUid != null" >
+        user_uid = #{userUid,jdbcType=VARCHAR},
+      </if>
+      <if test="relation != null" >
+        relation = #{relation,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+  <update id="updateByUidPersonId" parameterType="com.boco.modules.fdoc.model.UserRealtion" >
+    update t_user_relation
+
+      set  relation = #{relation,jdbcType=VARCHAR}
+     
+    where user_uid = #{userUid} and  person_id = #{personId,jdbcType=VARCHAR}
+  </update>
+  
+ 
+</mapper>

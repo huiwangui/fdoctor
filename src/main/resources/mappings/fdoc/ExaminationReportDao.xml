@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.boco.modules.fdoc.dao.ExaminationReportDao">
+	<!-- 新增体检报告 -->
+	<insert id="insert" parameterType="com.boco.modules.fdoc.model.ExaminationReportEntity" >
+	   insert into t_examination_report (person_id, doc_id, 
+	     create_time, content, examination_id)
+	   values (#{personId,jdbcType=VARCHAR}, #{docId,jdbcType=VARCHAR}, 
+	     #{createTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR}, #{examinationId,jdbcType=VARCHAR})
+	 </insert>
+	 
+	 <!-- 获取体检报告列表 -->
+	 <select id="getReportList" parameterType="com.boco.modules.fdoc.vo.ExaminationReportVo" resultType="com.boco.modules.fdoc.vo.ExaminationReportVo">
+	 	SELECT
+			a.id,
+			a.person_id,
+			a.doc_id,
+			a.examination_id,
+			a.content,
+			a.create_time,
+			b.doc_name,
+			c.person_name
+		FROM
+			t_examination_report a
+		LEFT JOIN t_doctor b ON a.doc_id = b.id
+		LEFT JOIN t_person_information c ON a.person_id = c.person_id
+		
+	 </select>
+	 
+	 <!-- 获取体检报告详情 -->
+	 <select id="getReportDetail" parameterType="string" resultType="com.boco.modules.fdoc.vo.ExaminationReportVo">
+	 	SELECT
+			a.id,
+			a.person_id,
+			a.doc_id,
+			a.examination_id,
+			a.content,
+			a.create_time,
+			b.doc_name,
+			c.person_name
+		FROM
+			t_examination_report a
+		LEFT JOIN t_doctor b ON a.doc_id = b.id
+		LEFT JOIN t_person_information c ON a.person_id = c.person_id
+		where a.id = #{0}
+	 </select>
+</mapper>
